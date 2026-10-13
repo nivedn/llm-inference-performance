@@ -1,0 +1,70 @@
+@page { size: A4; margin: 18mm 17mm 20mm; }
+
+:root {
+  --ink: #1e293b;
+  --muted: #64748b;
+  --accent: #1e3a8a;
+  --rule: #cbd5e1;
+  --code-bg: #f1f5f9;
+}
+
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 10pt;
+  line-height: 1.45;
+  color: var(--ink);
+  background: #fff;
+  max-width: none;
+  margin: 0;
+}
+
+header#title-block-header {
+  border-bottom: 3px solid var(--accent);
+  padding-bottom: 10mm;
+  margin: 30mm 0 10mm;
+}
+h1.title { font-size: 28pt; color: var(--accent); margin: 0 0 4mm; line-height: 1.15; }
+p.subtitle { font-size: 13pt; color: var(--muted); margin: 0 0 6mm; }
+p.date { font-size: 9pt; color: var(--muted); margin: 0; }
+
+nav#TOC { break-after: page; }
+nav#TOC::before { content: "Contents"; display: block; font-size: 16pt; font-weight: 700; color: var(--accent); margin-bottom: 4mm; }
+nav#TOC ul { list-style: none; padding-left: 0; margin: 0; }
+nav#TOC ul ul { padding-left: 6mm; font-size: 9pt; }
+nav#TOC li { margin: 1.2mm 0; }
+nav#TOC a { color: var(--ink); text-decoration: none; }
+
+h1, h2, h3, h4 { color: var(--accent); line-height: 1.25; break-after: avoid; }
+h1 { font-size: 17pt; border-bottom: 1px solid var(--rule); padding-bottom: 2mm; margin-top: 9mm; break-before: page; }
+h2 { font-size: 13pt; margin-top: 7mm; }
+h3 { font-size: 11pt; margin-top: 5mm; }
+h4 { font-size: 10pt; margin-top: 4mm; }
+hr { display: none; }
+
+a { color: var(--accent); }
+
+table { border-collapse: collapse; width: 100%; margin: 3mm 0 5mm; font-size: 8.5pt; break-inside: auto; }
+thead { display: table-header-group; }
+tr { break-inside: avoid; }
+th, td { border: 1px solid var(--rule); padding: 1.4mm 2mm; text-align: left; vertical-align: top; }
+th { background: #e2e8f0; }
+
+code { font-family: Menlo, Consolas, monospace; font-size: 8.5pt; color: #9f1239; }
+pre {
+  background: var(--code-bg);
+  border-left: 3px solid #94a3b8;
+  padding: 3mm 4mm;
+  font-size: 8pt;
+  line-height: 1.35;
+  white-space: pre-wrap;
+  break-inside: avoid;
+}
+pre code { color: var(--ink); font-size: inherit; }
+
+blockquote { margin: 3mm 0; padding: 2mm 4mm; border-left: 3px solid var(--accent); background: #eff6ff; color: var(--ink); }
+
+figure { margin: 4mm 0 6mm; text-align: center; break-inside: avoid; }
+figure img { max-width: 100%; max-height: 225mm; height: auto !important; width: auto !important; }
+figcaption { font-size: 8.5pt; color: var(--muted); margin-top: 2mm; }

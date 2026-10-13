@@ -1,0 +1,1450 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Assignment 0 Review</title>
+<style>
+:root {
+  --bg: #f6f7fb; --panel: #fff; --ink: #0f172a; --muted: #64748b; --line: #e2e8f0; --soft: #f1f5f9;
+  --accent: #1d4ed8; --accent-soft: #dbeafe; --ok: #047857; --ok-soft: #d1fae5; --bad: #b91c1c; --bad-soft: #fee2e2;
+  --warn: #b45309; --warn-soft: #fef3c7; --code: #9f1239;
+  --s-now: #dc2626; --s-gpu: #ea580c; --s-soon: #ca8a04; --s-nice: #64748b;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0b1020; --panel: #121a2b; --ink: #e5e7eb; --muted: #94a3b8; --line: #24314b; --soft: #1a2438;
+    --accent: #93c5fd; --accent-soft: #1e3a8a66; --ok: #34d399; --ok-soft: #064e3b88; --bad: #f87171; --bad-soft: #7f1d1d66;
+    --warn: #fbbf24; --warn-soft: #78350f66; --code: #fda4af;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0b1020; --panel: #121a2b; --ink: #e5e7eb; --muted: #94a3b8; --line: #24314b; --soft: #1a2438;
+  --accent: #93c5fd; --accent-soft: #1e3a8a66; --ok: #34d399; --ok-soft: #064e3b88; --bad: #f87171; --bad-soft: #7f1d1d66;
+  --warn: #fbbf24; --warn-soft: #78350f66; --code: #fda4af;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 22px 16px 60px; }
+h1 { font-size: 23px; margin: 0; letter-spacing: -.01em; }
+h2 { font-size: 20px; margin: 4px 0 6px; line-height: 1.3; }
+h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 22px 0 8px; }
+p { margin: 0 0 10px; }
+code { font: 13px Menlo, Consolas, monospace; color: var(--code); background: var(--soft); padding: 1px 5px; border-radius: 4px; }
+pre { font: 12.5px/1.5 Menlo, Consolas, monospace; background: var(--soft); padding: 10px 12px; border-radius: 8px; overflow-x: auto; margin: 8px 0; }
+.sub { color: var(--muted); margin: 4px 0 16px; max-width: 760px; }
+.top { display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 14px; }
+.progress { min-width: 220px; }
+.progress .bar { height: 7px; background: var(--soft); border-radius: 99px; overflow: hidden; margin-top: 4px; }
+.progress .bar i { display: block; height: 100%; background: var(--ok); }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
+
+/* principles */
+.principles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+@media (min-width: 1100px) { .principles { grid-template-columns: repeat(6, 1fr); } }
+@media (max-width: 560px) { .principles { grid-template-columns: 1fr 1fr; } }
+.pr { text-align: left; font: inherit; color: inherit; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; cursor: pointer; }
+.pr b { display: block; font-size: 13.5px; }
+.pr span { font-size: 12px; color: var(--muted); }
+.pr.on { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+
+/* layout */
+.layout { display: grid; grid-template-columns: 270px 1fr; gap: 16px; align-items: start; }
+nav.list { position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow-y: auto; padding: 6px; }
+.grp { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); padding: 10px 8px 4px; }
+.item { display: flex; gap: 8px; align-items: flex-start; width: 100%; text-align: left; font: inherit; font-size: 13.5px; color: inherit; background: none; border: 0; border-radius: 8px; padding: 7px 8px; cursor: pointer; }
+.item:hover { background: var(--soft); }
+.item.on { background: var(--accent-soft); }
+.item.dim { opacity: .35; }
+.item .n { font-variant-numeric: tabular-nums; color: var(--muted); min-width: 20px; }
+.item .ck { margin-left: auto; color: var(--ok); font-weight: 700; }
+.sev { width: 8px; height: 8px; border-radius: 50%; margin-top: 7px; flex: none; }
+.s-now { background: var(--s-now); } .s-gpu { background: var(--s-gpu); } .s-soon { background: var(--s-soon); } .s-nice { background: var(--s-nice); }
+
+article { padding: 20px 22px 24px; min-width: 0; }
+.meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: 12.5px; color: var(--muted); }
+.pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 2px 9px; border-radius: 99px; background: var(--soft); color: var(--muted); }
+.box { border-radius: 10px; padding: 12px 14px; margin: 10px 0; }
+.box.why { background: var(--bad-soft); }
+.box.why b:first-child { color: var(--bad); }
+.box.fix { background: var(--accent-soft); }
+.box.note { background: var(--warn-soft); font-size: 13.5px; }
+.think ol { margin: 6px 0 0; padding-left: 20px; }
+.think li { margin: 4px 0; }
+details.hint { border: 1px dashed var(--line); border-radius: 10px; padding: 8px 12px; margin: 8px 0; }
+details.hint summary { cursor: pointer; font-weight: 600; font-size: 13.5px; color: var(--accent); }
+details.hint[open] summary { margin-bottom: 6px; }
+
+/* demo */
+.demo { border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin: 10px 0 4px; background: var(--bg); }
+.demo .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 8px; }
+.ctrl { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; margin-bottom: 12px; font-size: 13.5px; }
+.ctrl label { display: flex; gap: 8px; align-items: center; }
+.ctrl input[type=range] { width: 130px; accent-color: var(--accent); }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
+.seg button { font: inherit; font-size: 13px; border: 0; background: var(--panel); color: var(--ink); padding: 6px 11px; cursor: pointer; border-right: 1px solid var(--line); }
+.seg button:last-child { border-right: 0; }
+.seg button.on { background: var(--accent); color: #fff; }
+:root[data-theme="dark"] .seg button.on { color: #0b1020; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .seg button.on { color: #0b1020; } }
+.b { font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
+.b:hover { border-color: var(--accent); }
+.b.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+:root[data-theme="dark"] .b.primary { color: #0b1020; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .b.primary { color: #0b1020; } }
+table.cmp { width: 100%; border-collapse: collapse; font-size: 13.5px; margin-top: 8px; }
+table.cmp th, table.cmp td { text-align: left; padding: 7px 9px; border-bottom: 1px solid var(--line); vertical-align: top; }
+table.cmp th { font-size: 11.5px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+td.wrong { background: var(--bad-soft); color: var(--bad); font-weight: 600; }
+td.right { color: var(--ok); }
+td.unk { color: var(--warn); font-weight: 600; }
+.tblwrap { overflow-x: auto; }
+
+/* timeline demo */
+.tl { position: relative; height: 92px; margin: 6px 4px 2px; }
+.tl .axis { position: absolute; left: 0; right: 0; top: 46px; height: 2px; background: var(--line); }
+.tl .pre { position: absolute; top: 40px; height: 14px; background: var(--warn-soft); border-radius: 4px; }
+.tl .tok { position: absolute; top: 14px; width: 3px; height: 18px; background: var(--muted); border-radius: 2px; opacity: .55; transform: translateX(-1px); }
+.tl .ev { position: absolute; top: 60px; transform: translateX(-50%); font-size: 11px; background: var(--accent); color: #fff; border-radius: 5px; padding: 1px 5px; white-space: nowrap; transition: opacity .15s; }
+:root[data-theme="dark"] .tl .ev { color: #0b1020; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tl .ev { color: #0b1020; } }
+.tl .ev.hidden { opacity: 0; }
+.tl .cursor { position: absolute; top: 4px; bottom: 0; width: 2px; background: var(--bad); display: none; }
+.tl .tag { position: absolute; font-size: 11px; color: var(--muted); }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--muted); margin-top: 2px; }
+.legend i { display: inline-block; width: 14px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+
+/* process demo */
+.procs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 10px 0; }
+.proc { border: 1.5px solid var(--line); border-radius: 10px; padding: 10px; min-height: 92px; font-size: 13px; background: var(--panel); transition: all .2s; }
+.proc b { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin-bottom: 4px; }
+.proc.ghost { opacity: .3; border-style: dashed; }
+.proc.badp { border-color: var(--bad); background: var(--bad-soft); }
+.proc.okp { border-color: var(--ok); background: var(--ok-soft); }
+.proc.hot { border-color: var(--warn); background: var(--warn-soft); }
+.log { font: 12.5px Menlo, Consolas, monospace; background: var(--soft); border-radius: 8px; padding: 8px 10px; min-height: 40px; }
+
+/* terminal */
+.term { font: 12.5px/1.6 Menlo, Consolas, monospace; background: #0f172a; color: #e2e8f0; border-radius: 10px; padding: 10px 12px; overflow-x: auto; white-space: pre; }
+.term .c { color: #94a3b8; } .term .g { color: #86efac; } .term .r { color: #fca5a5; } .term .y { color: #fde68a; }
+.verdict { margin-top: 10px; padding: 9px 12px; border-radius: 8px; font-weight: 600; font-size: 14px; }
+.verdict.ok { background: var(--ok-soft); color: var(--ok); }
+.verdict.bad { background: var(--bad-soft); color: var(--bad); }
+.verdict.warn { background: var(--warn-soft); color: var(--warn); }
+
+/* segment bar */
+.segbar { display: flex; height: 36px; border-radius: 8px; overflow: hidden; margin: 8px 0; font-size: 12px; }
+.segbar div { display: flex; align-items: center; justify-content: center; color: var(--ink); border-right: 2px solid var(--bg); transition: opacity .2s; text-align: center; line-height: 1.15; padding: 0 4px; }
+.segbar div.off { opacity: .25; }
+.big { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* chips grid */
+.chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+.chip { border: 1px solid var(--line); border-radius: 9px; padding: 8px 10px; font-size: 13px; background: var(--panel); cursor: pointer; text-align: left; font-family: inherit; color: inherit; }
+.chip small { display: block; color: var(--muted); font-size: 11.5px; }
+.chip.guess-y { border-color: var(--accent); }
+.chip.rev-y { border-color: var(--ok); background: var(--ok-soft); }
+.chip.rev-n { border-color: var(--bad); background: var(--bad-soft); }
+
+/* quiz */
+.quiz .opt { display: block; width: 100%; text-align: left; font: inherit; font-size: 14px; color: inherit; background: var(--panel); border: 1px solid var(--line); border-radius: 9px; padding: 8px 12px; margin: 6px 0; cursor: pointer; }
+.quiz .opt:hover { border-color: var(--accent); }
+.quiz .opt.ok { border-color: var(--ok); background: var(--ok-soft); }
+.quiz .opt.no { border-color: var(--bad); background: var(--bad-soft); }
+.quiz .why { font-size: 13.5px; margin-top: 6px; }
+
+.foot { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 24px; padding-top: 14px; border-top: 1px solid var(--line); }
+.got { background: var(--ok); color: #fff; border-color: var(--ok); }
+textarea { width: 100%; min-height: 84px; font: inherit; font-size: 14px; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; resize: vertical; }
+.qa { margin: 12px 0; }
+.qa label { font-weight: 600; display: block; margin-bottom: 4px; }
+svg text { fill: var(--muted); font-size: 11px; }
+
+/* solutions */
+.solbtn { margin-top: 22px; width: 100%; padding: 11px; font-weight: 600; }
+.sol { margin-top: 20px; border: 1.5px solid var(--ok); border-radius: 12px; padding: 16px 18px; background: var(--panel); }
+.sol > .hd { display: flex; align-items: center; gap: 8px; color: var(--ok); font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; }
+.sol .idea { font-size: 16px; font-weight: 600; margin: 8px 0 10px; }
+.sol ol.steps { padding-left: 20px; margin: 6px 0 10px; }
+.sol ol.steps li { margin: 5px 0; }
+.ba { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; }
+.ba > div > b { font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; }
+.ba .bef b { color: var(--bad); } .ba .aft b { color: var(--ok); }
+.ba pre { margin: 4px 0 0; font-size: 12px; }
+.trade { background: var(--warn-soft); border-radius: 10px; padding: 10px 13px; font-size: 13.5px; margin-top: 10px; }
+.yours { font-size: 13px; color: var(--muted); margin-top: 10px; }
+.lanes { display: grid; gap: 8px; margin: 8px 0; }
+.lane { display: grid; grid-template-columns: 92px 1fr; gap: 8px; align-items: stretch; }
+.lane > span { font-size: 12px; font-weight: 600; color: var(--muted); display: flex; align-items: center; }
+.lane .row { display: flex; gap: 6px; flex-wrap: wrap; }
+.node { font: inherit; font-size: 12.5px; color: inherit; text-align: left; border: 1.5px solid var(--line); background: var(--panel); border-radius: 9px; padding: 7px 10px; cursor: pointer; min-width: 110px; flex: 1; }
+.node.on { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+.node.ghost { visibility: hidden; }
+.node.okn { border-color: var(--ok); background: var(--ok-soft); }
+.node.badn { border-color: var(--bad); background: var(--bad-soft); }
+.node.warnn { border-color: var(--warn); background: var(--warn-soft); }
+.node small { display: block; color: var(--muted); font-size: 11px; }
+.matrix td, .matrix th { text-align: center !important; }
+.matrix td:first-child, .matrix th:first-child { text-align: left !important; }
+.cell { cursor: pointer; border-radius: 6px; padding: 3px 6px; display: inline-block; font-weight: 600; font-size: 12.5px; }
+.cell.ok { background: var(--ok-soft); color: var(--ok); } .cell.bad { background: var(--bad-soft); color: var(--bad); } .cell.warn { background: var(--warn-soft); color: var(--warn); }
+.cell.sel { outline: 2px solid var(--accent); }
+.stack { display: flex; flex-direction: column-reverse; gap: 5px; margin: 8px 0; }
+.layer { display: flex; justify-content: space-between; gap: 10px; align-items: center; }
+.row7 { display: grid !important; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.row7 .node { min-width: 0; font-size: 11.5px; padding: 6px 7px; }
+.flow { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin: 10px 0; }
+.flow .arr { color: var(--muted); }
+
+@media (max-width: 860px) {
+  .ba { grid-template-columns: 1fr; }
+  .lane { grid-template-columns: 1fr; }
+  .row7 { grid-template-columns: 1fr; }
+  .row7 .ghost { display: none; }
+  .layout { grid-template-columns: 1fr; }
+  nav.list { position: static; max-height: none; display: flex; overflow-x: auto; gap: 4px; padding: 6px; }
+  nav.list .grp { display: none; }
+  .item { flex: none; width: auto; white-space: nowrap; }
+  .item .t { display: none; }
+  article { padding: 16px 14px 20px; }
+  .procs { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1>Assignment 0 review: what's wrong, and how to think about it</h1>
+      <p class="sub">16 findings from <code>env.py</code>, <code>schema.py</code> and <code>stats.py</code>. Each one has a plain explanation, a demo you can play with, the thinking that leads to a fix, and a quick check. No code solutions: you write those in task 0.2. Numbers in the demos are made up to illustrate the idea; they are not measurements.</p>
+    </div>
+    <div class="progress"><div style="font-size:13px" id="prog"></div><div class="bar"><i id="progbar"></i></div></div>
+  </div>
+
+  <h3 style="margin-top:0">Six principles behind every finding (click one to filter)</h3>
+  <div class="principles" id="principles"></div>
+
+  <div class="layout">
+    <nav class="list panel" id="nav"></nav>
+    <article class="panel" id="main"></article>
+  </div>
+</div>
+
+<script>
+/* ---------------------------------------------------------------- data */
+const PRINCIPLES = {
+  unknown: { t: "Unknown beats wrong", d: "A missing value gets noticed. A wrong value that looks right gets published." },
+  raw: { t: "Raw facts, clearly defined", d: "Store what was observed, define exactly what it means, derive everything else." },
+  observer: { t: "Don't disturb what you measure", d: "Measuring must not change the thing being measured." },
+  conditions: { t: "Record what changes the number", d: "Same code, different conditions → different results. Capture the conditions." },
+  provenance: { t: "Reproducible and traceable", d: "Anyone must be able to get back to the exact code and software that ran." },
+  public: { t: "Publish nothing private", d: "Result files go to a public repo. Treat them that way." },
+};
+const SEV = {
+  now: { t: "Must fix now", c: "s-now", d: "Quietly corrupts results" },
+  gpu: { t: "Before the GPU phase", c: "s-gpu", d: "Breaks once real GPUs are involved" },
+  soon: { t: "Fix soon", c: "s-soon", d: "Traceability and safety" },
+  nice: { t: "Nice to have", c: "s-nice", d: "Quality" },
+};
+
+const F = [
+  {
+    n: 1, sev: "now", file: "schema.py", where: "RequestRecord", pr: ["unknown", "raw"],
+    title: "The schema assumes every runtime streams exactly one token per event",
+    simple: `<p><code>RequestRecord</code> stores one timestamp per thing the runtime sends back, then <b>assumes each thing is one token</b>. It counts output tokens as <code>len(token_times_ns)</code> and treats the first timestamp as the first token.</p>
+      <p>That's only true for one kind of runtime. HF <code>generate()</code> and vLLM's offline API return the <b>whole answer at once</b>, and many streaming servers send <b>several tokens per event</b>.</p>`,
+    why: `For a non-streaming runtime the schema reports 1 output token and a TTFT equal to the whole request time. Throughput comes out hundreds of times too low. Nothing crashes, and the JSON looks perfectly normal.`,
+    demo: "stream",
+    think: [
+      "What is one <i>observation</i> from a runtime: a token, a chunk of text, or a whole response? What do you need to record about each?",
+      "For a non-streaming request, which metrics can you still measure honestly? Which can't you know at all?",
+      "When you can't know a value, how should the record say so, so that the summary can't mistake it for a real number?",
+      "Once some requests have unknown TTFT, how should <code>summarize()</code> keep them out of the TTFT distribution without hiding that they exist?",
+    ],
+    hint: `Separate <b>counting tokens</b> from <b>timing events</b>. An event has a time and a token count. Whether TTFT/ITL can be measured depends on how the runtime delivers output, so record that fact about the request, and let "can't be measured" be an explicit state, not a misleading number.`,
+    quiz: { q: "A non-streaming runtime returns 256 tokens in one response, 3.0 s after submit. What does the current schema report?", o: [
+      ["TTFT = 3.0 s, output tokens = 1", true, "Right. There's one timestamp, so the schema sees one 'token' that arrived at 3.0 s. Both numbers are wrong, and both look plausible."],
+      ["TTFT unknown, output tokens = 256", false, "That's what it <i>should</i> report. The current code can't express either 'unknown' or a token count separate from timestamps."],
+      ["TTFT = prefill time, output tokens = 256", false, "The client never sees when prefill finished. Only the engine knows that, and the response doesn't include it."],
+      ["The code raises an error", false, "That would actually be better. It silently produces wrong numbers instead."],
+    ] },
+  },
+  {
+    n: 2, sev: "now", file: "env.py", where: "_torch_info(), line 117", pr: ["observer"],
+    title: "Taking the snapshot initializes CUDA in the process you're about to measure",
+    simple: `<p><code>torch.cuda.get_device_properties()</code> starts CUDA in the benchmark process. That creates a <b>CUDA context</b> on the GPU, which takes time and reserves GPU memory.</p>
+      <p>The bigger problem: on Linux with Python 3.12, worker processes are created with <code>fork</code>, which copies the parent. CUDA can't be used in a forked copy of a process that already started CUDA.</p>`,
+    why: `The first time you add worker processes (or run vLLM, which starts its own), workers crash with <code>Cannot re-initialize CUDA in forked subprocess</code>. Even without workers, the snapshot changed GPU memory and startup time before the benchmark ran.`,
+    demo: "fork",
+    note: `Correction to my first review: I said <code>torch.cuda.is_available()</code> is safe. By default it also talks to the CUDA driver; PyTorch documents that it only avoids this when <code>PYTORCH_NVML_BASED_CUDA_CHECK=1</code> is set. So treat <i>every</i> CUDA call in the snapshot as suspect.`,
+    think: [
+      "Which pieces of GPU information do you actually need, and which tools can provide them <i>without</i> touching CUDA in your process?",
+      "If you must use torch to get some info, where could that code run so its side effects don't reach the benchmark process?",
+      "When should the snapshot be taken relative to model loading and the measured requests? Does the order matter?",
+    ],
+    hint: `The general rule is <b>read state from outside, don't create it</b>. NVML / <code>nvidia-smi</code> query the driver without creating a context in your process. If torch-specific info is needed, gather it in a short-lived separate process.`,
+    quiz: { q: "Why does the forked worker fail?", o: [
+      ["The parent already started CUDA, and CUDA state can't be carried into a forked copy", true, "Right. fork copies the process memory, including half of a CUDA setup that the GPU driver doesn't recognize in the child."],
+      ["The GPU ran out of memory", false, "The context does use memory, but that's not why the child fails."],
+      ["Workers need a different torch version", false, "Same interpreter, same packages. The problem is process state."],
+      ["nvidia-smi isn't installed in the worker", false, "Workers don't run nvidia-smi. The failure is inside CUDA itself."],
+    ] },
+  },
+  {
+    n: 3, sev: "now", file: "env.py", where: "_git_info(), line 64", pr: ["unknown", "provenance"],
+    title: "Git runs in whatever directory you launched from",
+    simple: `<p><code>_git_info()</code> runs <code>git rev-parse HEAD</code> in the <b>current directory</b>, not in the project's repo. You saw this: from <code>~</code> it returned <code>null</code>.</p>
+      <p>The worst case isn't <code>null</code>. If you launch from inside <i>another</i> repository, it records <b>that repo's commit</b>.</p>`,
+    why: `A wrong commit hash looks like valid provenance. Months later you'd check out that hash to reproduce a result and get completely different code, with nothing telling you why.`,
+    demo: "git",
+    think: [
+      "The code knows where <i>it</i> lives on disk. How can it find its own repo regardless of where it was launched from?",
+      "Rank these outcomes from best to worst: correct hash, <code>null</code>, an error, a hash from the wrong repo. Why that order?",
+      "How could a test prove this works from another directory?",
+    ],
+    hint: `Anchor to the file's own location (<code>__file__</code>), find the repo from there, and tell git which directory to use instead of relying on the current one.`,
+    quiz: { q: "Which outcome is the worst?", o: [
+      ["commit: null", false, "Bad, but visible. Anyone reading the result sees provenance is missing."],
+      ["commit: a hash from a different repo", true, "Right. It looks valid, so nobody questions it, and it points to the wrong code."],
+      ["dirty: true", false, "That's honest information. It's incomplete (see #7) but not misleading."],
+      ["The script crashes", false, "A crash gets fixed immediately. Silent wrong data doesn't."],
+    ] },
+  },
+  {
+    n: 4, sev: "now", file: "schema.py", where: "summarize() / RunResult.load()", pr: ["raw"],
+    title: "Wall time has no definition, and it's stored as a derived value",
+    simple: `<p>Throughput = tokens ÷ <code>wall_time_s</code>. But nothing says <b>when the clock starts and stops</b>. Does it include loading the model? Warmup? Saving the file? Whoever calls <code>summarize()</code> decides, and could decide differently each time.</p>
+      <p>Also, <code>wall_time_s</code> is a <b>raw input</b> but it's stored only inside <code>summary</code> (the derived section), and <code>load()</code> reads it back from there.</p>`,
+    why: `The same run can give very different throughput depending on an undocumented choice. And it breaks the rule "the summary is always recomputed from raw data": one raw fact only exists inside the summary.`,
+    demo: "wall",
+    think: [
+      "Which stretch of time actually corresponds to the work whose tokens you're counting?",
+      "Can wall time be <i>derived</i> from data you already store per request (submit times, token times)? What would that definition be?",
+      "If you store it explicitly instead, what exactly is recorded (start and end events, not just a duration)?",
+    ],
+    hint: `Decide on one definition and write it in <code>docs/benchmark-methodology.md</code>. Then either derive it from the request records (first submit → last token) or store start/end timestamps as raw data. Raw data goes in the raw section; <code>summary</code> must be fully recomputable from it.`,
+    quiz: { q: "The caller includes 20 s of model loading in wall time. The reported throughput is…", o: [
+      ["Lower than the real serving throughput", true, "Right. The same tokens are divided by a longer time."],
+      ["Higher than the real throughput", false, "More time in the denominator makes the number smaller, not bigger."],
+      ["Unchanged", false, "Throughput is tokens ÷ time, so the time window matters directly."],
+    ] },
+  },
+  {
+    n: 5, sev: "now", file: "schema.py", where: "RequestRecord / BenchmarkConfig", pr: ["unknown", "conditions"],
+    title: "Requested and actual output length are never compared",
+    simple: `<p>You ask for 256 output tokens, but a model can stop early when it emits its end-of-sequence token. Nothing records how many tokens were <b>requested</b>, how many were <b>generated</b>, or <b>why generation stopped</b>.</p>`,
+    why: `Two runs that did different amounts of work get compared as if they were the same. Shorter answers make E2E latency and requests/s look better. Tokens/s also shifts, because prefill becomes a bigger share of each request.`,
+    note: `Correction to my first review: I said tokens/s gets "inflated". That's too simple. Shorter outputs make E2E and requests/s look better, but tokens/s per request can go <i>down</i>, because the fixed prefill cost is spread over fewer tokens. Try it in the demo. The real point is that the comparison is invalid either way.`,
+    demo: "eos",
+    think: [
+      "For a fair comparison, what has to be identical across runs, and how do you <i>check</i> that it was?",
+      "What should happen to a request that produced fewer tokens than requested: drop it, flag it, or keep it?",
+      "Can runtimes be told to ignore the end-of-sequence token? When is that appropriate, and when isn't it?",
+    ],
+    hint: `Record requested max tokens, actual tokens and the stop reason for every request. For throughput benchmarks, force a fixed length where the runtime supports it. Then make <code>summarize()</code> report (or refuse) runs where lengths don't match.`,
+    quiz: { q: "Runtime B is exactly as fast as A, but stops at 64 of 256 tokens. B's E2E latency looks…", o: [
+      ["Better, but the comparison is invalid", true, "Right. B did a quarter of the decode work. It isn't faster."],
+      ["The same, because speed is the same", false, "Speed per token is the same, but B does fewer tokens, so each request finishes sooner."],
+      ["Worse", false, "Fewer decode steps means a shorter E2E."],
+    ] },
+  },
+  {
+    n: 6, sev: "gpu", file: "env.py", where: "NVIDIA_SMI_FIELDS, line 44", pr: ["conditions"],
+    title: "GPU specs are recorded, but not the GPU's actual state",
+    simple: `<p><code>clocks.max.sm</code> is the <b>spec sheet</b>: the fastest the GPU <i>can</i> run. It says nothing about what it <i>did</i> run at. GPUs slow down when hot or at their power limit, and other processes may be using the same GPU.</p>
+      <p>The snapshot is also taken <b>once</b>, at the start, so anything that changes during the run is invisible.</p>`,
+    why: `Two runs on the "same GPU" can differ because one was throttled or shared. The result files would look identical, and you'd misattribute the difference to your code change.`,
+    demo: "clock",
+    think: [
+      "List everything about a GPU's <i>state</i> (not its specs) that changes how fast a kernel runs.",
+      "Which of those change slowly enough for a before/after snapshot, and which need continuous sampling during the run?",
+      "Should the benchmark lock GPU clocks for repeatability? What's the cost of doing that?",
+    ],
+    hint: `Split the job: the snapshot captures state before <i>and</i> after the run (current clocks, temperature, power, throttle reasons, other processes on the GPU); the sampler (task 2.5) records it continuously during the run.`,
+    quiz: { q: "env.py records clocks.max.sm. That tells you…", o: [
+      ["The GPU's maximum possible clock, not the clock during your run", true, "Right. It's fixed for the GPU model and never changes between runs."],
+      ["The average clock during the run", false, "It's captured once, before the run, and it's the spec maximum."],
+      ["Whether the GPU was throttled", false, "Throttling needs current clocks and throttle reasons, which aren't recorded."],
+    ] },
+  },
+  {
+    n: 7, sev: "gpu", file: "env.py", where: "_git_info(), line 67", pr: ["provenance"],
+    title: "'dirty: true' throws away the information you'd need",
+    simple: `<p><code>dirty: true</code> says the code differed from the last commit, but not <b>how</b>. Your current output (<code>commit: null, dirty: true</code>) says "some unknown code ran".</p>`,
+    why: `A result produced from uncommitted changes can't be reproduced. If it ends up in the report, no one (including you) can recreate it.`,
+    demo: "dirty",
+    think: [
+      "What's the difference between a <i>development</i> run and a <i>report</i> run? Should the runner treat them differently?",
+      "If a dirty run is allowed, what minimum information would make it reproducible later?",
+      "What should the runner do by default, and how do you override it deliberately (and record that you did)?",
+    ],
+    hint: `Report runs require a clean, committed tree. Dev runs can be allowed with an explicit flag, and the flag itself is recorded in the result, together with a fingerprint (e.g. a hash) of the uncommitted changes.`,
+    quiz: { q: "commit: null, dirty: true. For a report run, the runner should…", o: [
+      ["Refuse, or clearly label the result as not reproducible", true, "Right. Only committed code can be traced."],
+      ["Run normally; the dirty flag is enough", false, "The flag says something changed, not what."],
+      ["Commit automatically before running", false, "That makes surprise commits with unreviewed code. Too much magic."],
+      ["Discard local changes first", false, "That destroys your work. Never."],
+    ] },
+  },
+  {
+    n: 8, sev: "gpu", file: "env.py", where: "TRACKED_PACKAGES, line 21", pr: ["provenance", "conditions"],
+    title: "The package list is hand-picked and misses things that affect speed",
+    simple: `<p><code>TRACKED_PACKAGES</code> lists 8 packages by hand. Many things that change inference speed aren't on it: CUDA libraries, attention kernels, quantization libraries, the CUDA compiler, the cloud instance type. Meanwhile <code>uv.lock</code> already pins every Python package exactly.</p>`,
+    why: `A result can't be reproduced if a library that affects speed changed and nothing recorded it. Hand-picked lists also go stale as the project adds dependencies.`,
+    demo: "pkgs",
+    think: [
+      "Which file already pins every Python dependency exactly? How could a result point to it without copying it?",
+      "What affects speed but <i>isn't</i> a Python package (driver, compiler, hardware)?",
+      "The CUDA build of torch on the GPU VM is installed outside the lockfile. How do you capture what's actually installed there?",
+    ],
+    hint: `Record a hash of <code>uv.lock</code> plus a full freeze of what's actually installed, and add the non-Python pieces: <code>nvcc</code> version, driver, instance type.`,
+    quiz: { q: "Which source pins every Python package version exactly?", o: [
+      ["uv.lock", true, "Right. It's generated by uv and lists every package with an exact version and hash."],
+      ["TRACKED_PACKAGES", false, "That's 8 hand-picked names."],
+      ["pyproject.toml", false, "That has lower bounds like torch>=2.5, not exact versions."],
+    ] },
+  },
+  {
+    n: 9, sev: "gpu", file: "pyproject.toml", where: "[tool.uv] package = false", pr: ["provenance"],
+    title: "The code only runs from the repo root",
+    simple: `<p><code>python -m benchmarks.env</code> finds the <code>benchmarks</code> package only because Python puts the <b>current directory</b> on its import path. From <code>~</code> you got <code>ModuleNotFoundError</code>. Tests work only because pytest adds <code>.</code> via <code>pythonpath</code>.</p>`,
+    why: `Your GPU session script will run commands over SSH, maybe from another directory. It will hit exactly the error you saw, during paid GPU time.`,
+    demo: "cwd",
+    think: [
+      "Compare the options in the demo. Which ones are explicit, and which depend on someone remembering a step?",
+      "What else improves if the project is properly installed (imports in tests, CLI entry points)?",
+    ],
+    hint: `Making the project an installed package (uv installs it into <code>.venv</code> in editable mode) removes the dependency on the current directory. It's a small <code>pyproject.toml</code> change, and it also gives you a proper CLI entry point for task 0.6.`,
+    quiz: { q: "python -m benchmarks.env failed from ~ because…", o: [
+      ["Python looks for the package relative to the current directory, and it isn't installed", true, "Right. With -m, the current directory goes first on sys.path."],
+      ["uv didn't activate the venv", false, "uv run used the project's venv. The import path was the problem."],
+      ["The file has a syntax error", false, "It runs fine from the repo root."],
+    ] },
+  },
+  {
+    n: 10, sev: "gpu", file: "schema.py", where: "t_submit_ns / token_times_ns", pr: ["raw"],
+    title: "Timestamps only mean something on the clock that produced them",
+    simple: `<p><code>time.perf_counter_ns()</code> counts from an <b>unspecified starting point</b>. Python only promises that the <i>difference</i> between two readings in the same process is meaningful.</p>
+      <p>In practice, on Linux and macOS, processes on the <b>same machine</b> share a system-wide clock, so it usually works there. Across <b>different machines</b>, such as a load generator on your Mac and a server on the GPU VM, the values are unrelated.</p>`,
+    why: `TTFT computed as server timestamp − client timestamp would be meaningless, possibly negative. This becomes real in Phase 5, and it influences your Assignment 1 decision about threads vs processes.`,
+    note: `Correction to my first review: I said timestamps can't be compared across processes. On the same machine they usually can (Linux and macOS use a system-wide monotonic clock). The hard rule is across machines; across processes it's "works in practice, not guaranteed by Python".`,
+    demo: "clocks",
+    think: [
+      "For each metric, which machine should take <i>both</i> timestamps so they come from the same clock?",
+      "If the server reports its own timings (e.g. queue time), how would you combine them with client timings honestly?",
+      "Should a record say which clock its timestamps came from?",
+    ],
+    hint: `Compute every duration from two readings of the <b>same</b> clock. Client-observed metrics (TTFT, ITL, E2E) are measured entirely on the client. Server-side timings are reported as durations, never compared directly with client timestamps.`,
+    quiz: { q: "Client on the Mac records submit time; the server on the GPU VM records first-token time. TTFT = server − client is…", o: [
+      ["Meaningless: the two clocks have unrelated starting points", true, "Right. You'd be subtracting readings from two different clocks."],
+      ["Accurate to the millisecond", false, "Only if both used the same clock, which they don't."],
+      ["Accurate after adding network latency", false, "The problem is the clocks' starting points, not the network."],
+    ] },
+  },
+  {
+    n: 11, sev: "soon", file: "env.py", where: "capture_environment(), line 148", pr: ["public"],
+    title: "Your hostname goes into public result files",
+    simple: `<p>Every result file includes <code>"hostname": "Nived.local"</code>. Result files are committed to a public GitHub repo.</p>`,
+    why: `It identifies you and your machine, and it adds nothing useful for reproducibility. A hostname doesn't tell a reader what hardware it was.`,
+    demo: "host",
+    think: [
+      "What does a reader of your report actually need to know about the machine?",
+      "Is there anything else in the snapshot that's private or useless to a reader?",
+    ],
+    hint: `Record the <b>kind</b> of machine (e.g. "MacBook Air M5, 16 GB" or "AWS g6.xlarge"), not its name. If you need to tell your own machines apart, use a label you choose.`,
+    quiz: { q: "What should you record instead of the hostname?", o: [
+      ["A machine description or cloud instance type", true, "Right. It's informative and not private."],
+      ["Nothing about the machine", false, "The hardware matters a lot for reproducibility. Just not its name."],
+      ["The machine's IP address", false, "Even more private, and just as useless to a reader."],
+    ] },
+  },
+  {
+    n: 12, sev: "soon", file: "env.py", where: "_cpu_info(), line 70", pr: ["conditions"],
+    title: "Mac power and thermal state aren't recorded",
+    simple: `<p>You saw <code>pmset</code> switch from AC to battery when you unplugged. Low Power Mode and heat also change performance, and your Air has no fan, so long runs slow down as it warms up. None of this is in the snapshot.</p>`,
+    why: `A run on battery in Low Power Mode and a run on the charger produce identical environment snapshots, so a slower result looks like a code regression.`,
+    demo: "power",
+    think: [
+      "What's the Linux equivalent of these settings on the GPU VM (hint: CPU frequency scaling)?",
+      "Should the runner refuse to run in some conditions (e.g. on battery), or just record them?",
+    ],
+    hint: `Record the power source, Low Power Mode and thermal state on macOS, and the CPU frequency governor on Linux. Warn when conditions are known to hurt repeatability.`,
+    quiz: { q: "env.py output on AC power vs on battery is…", o: [
+      ["Identical", true, "Right. Nothing in the snapshot reflects power state, which is the problem."],
+      ["Different in the cpu section", false, "The cpu section only has model, cores and memory."],
+    ] },
+  },
+  {
+    n: 13, sev: "soon", file: "env.py", where: "_run(), line 56", pr: ["unknown"],
+    title: "Every error becomes the same null",
+    simple: `<p><code>_run()</code> catches every failure and returns <code>None</code>. "Not installed", "crashed" and "timed out" all end up as the same <code>null</code> in the JSON.</p>`,
+    why: `When <code>nvidia_smi</code> is null on the GPU VM, you can't tell a missing tool from a broken driver from a hung GPU. Those need completely different responses.`,
+    demo: "run",
+    think: [
+      "What's the difference between 'this value doesn't apply here' (no GPU on a Mac) and 'getting this value failed'?",
+      "How should a failure be represented in the JSON so a reader (or code) can tell what happened?",
+    ],
+    hint: `Keep the value and the reason separate: when something fails, record why (not found, exit code + stderr, timeout) next to the null.`,
+    quiz: { q: "nvidia_smi: null in a result from the GPU VM means…", o: [
+      ["You can't tell: not installed, crashed and timed out all look the same", true, "Right. That's the finding."],
+      ["The VM has no GPU", false, "Possible, but so are three other explanations."],
+      ["nvidia-smi timed out", false, "Possible, but nothing in the JSON tells you that."],
+    ] },
+  },
+  {
+    n: 14, sev: "nice", file: "env.py", where: "_nvidia_smi(), line 101", pr: ["raw"],
+    title: "nvidia-smi values stay as unparsed text",
+    simple: `<p>Values like memory and clocks come back as strings, and can be <code>"[N/A]"</code> or <code>"[Not Supported]"</code>. Every analysis script would have to parse and clean them.</p>`,
+    why: `Small, but parsing in many places leads to inconsistencies. Parse once, at capture time, into numbers or null (with a reason, see #13).`,
+    think: ["Which fields should be numbers, and what unit should each have?", "What should <code>[N/A]</code> become?"],
+    hint: `Convert at capture time: numbers with units in the key name (e.g. <code>memory_total_mib</code>), and null plus a reason for unavailable values.`,
+  },
+  {
+    n: 15, sev: "nice", file: "env.py", where: "_torch_info(), line 117", pr: ["conditions"],
+    title: "On a Mac, the torch section says nothing about the GPU",
+    simple: `<p>The CUDA branch records device name, memory and SM count. On MPS (your Mac) it only records <code>mps_available: true</code>.</p>`,
+    why: `Minor, because Mac numbers never go into the report. Still useful for your own learning runs (task 0.10).`,
+    think: ["What would you want to know about the Mac's GPU for the bandwidth exercise in task 0.10?"],
+    hint: `Chip name, GPU core count and unified memory size are enough. Keep it short; this is not report data.`,
+  },
+  {
+    n: 16, sev: "nice", file: "tests/", where: "test_environment_is_json_serializable", pr: ["provenance"],
+    title: "The only env.py test is 'the output is valid JSON'",
+    simple: `<p>Nothing tests the failure paths: no git, no commits, no <code>nvidia-smi</code>, a timeout, running from another directory. Those are exactly the paths that broke in your experiments.</p>`,
+    why: `Without tests, fixes for #3, #9 and #13 can quietly regress.`,
+    think: ["How can a test simulate 'nvidia-smi not installed' on a machine where it is installed (or vice versa)?", "How would you test #3 using a temporary directory?"],
+    hint: `Make the external commands replaceable in tests (pytest's <code>monkeypatch</code> or a fake <code>_run</code>), and use <code>tmp_path</code> to build throwaway git repos.`,
+  },
+];
+
+/* ---------------------------------------------------------------- proposed solutions
+   Design-level proposals: data shapes, behaviour and order of operations.
+   Implementation is the owner's job (task 0.2). */
+const J = o => JSON.stringify(o, null, 2);
+const SOL = {
+  1: {
+    idea: "Record what was observed (events, each with a token count) separately from what was counted (output tokens). Make \"can't be measured\" an explicit state.",
+    steps: [
+      "Each request stores a list of <b>events</b>: <code>(time, tokens in this event)</code>. One event per token, per chunk, or one for the whole response. The same shape fits every runtime.",
+      "Each request stores its <b>delivery mode</b>: <code>per_token</code>, <code>chunked</code> or <code>none</code>. It's a fact about the runtime, recorded rather than guessed.",
+      "<b>Output tokens</b> are recorded explicitly (summed from events, or counted by the runtime/tokenizer), never inferred from the number of timestamps.",
+      "Each metric is derived <b>only when the delivery mode supports it</b>: TTFT needs streaming (for chunked it's labelled <i>time to first chunk</i>), per-token ITL needs per_token (for chunked, chunk gap ÷ tokens), and non-streaming gives only E2E and token count.",
+      "<code>summarize()</code> computes each distribution over the requests where that metric is measurable, and reports <b>how many were excluded and why</b>, so missing data is visible, not hidden.",
+    ],
+    demo: "stream_sol",
+    ba: [
+      J({ request_id: "r7", prompt_tokens: 1024, t_submit_ns: 0, token_times_ns: [3000000000], error: null }),
+      J({ request_id: "r7", prompt_tokens: 1024, delivery: "none", t_submit_ns: 0, events: [{ t_ns: 3000000000, tokens: 256 }], output_tokens: 256, error: null }),
+    ],
+    after2: `"ttft_ms": { "n": 0, "excluded": 64, "excluded_why": { "delivery=none": 64 } }`,
+    trade: "Chunked TTFT is really the time to the first <i>chunk</i>, an upper bound on true TTFT. Label it as such instead of pretending it's exact. And output length checks (#5) add more fields to the same record; design them together.",
+  },
+  2: {
+    idea: "Ask the driver about the GPU from outside your process, and order the run so nothing touches CUDA before the workers exist.",
+    steps: [
+      "Get device facts (name, memory, clocks, driver) through <b>NVML</b> (the <code>nvidia-ml-py</code> package) or <code>nvidia-smi</code>. Both query the driver without creating a CUDA context in your process.",
+      "Keep only torch facts that don't touch the device, like <code>torch.__version__</code> and <code>torch.version.cuda</code> (constants baked into the build). Anything that asks the <i>device</i> a question initializes CUDA.",
+      "If you ever need torch's view of the device, collect it in a short-lived <b>subprocess</b> and read its JSON output.",
+      "Defence in depth: start workers with the <b>spawn</b> start method (fresh interpreters, not copies), so even an accidental CUDA init in the main process can't break them.",
+      "Take the snapshot <b>before</b> loading the model and again <b>after</b> the run (see #6).",
+    ],
+    demo: "lifecycle",
+    trade: "spawn starts more slowly than fork (each worker re-imports everything). That costs a few seconds at startup and doesn't affect measured requests, which is a good trade.",
+  },
+  3: {
+    idea: "Anchor git to the project's own folder, then verify that folder really is the root of its own repository.",
+    steps: [
+      "Find the project root from the file's own location (<code>__file__</code>), not from the current directory.",
+      "Run git <b>in that folder</b> explicitly (git's <code>-C &lt;dir&gt;</code> option), so the launch directory no longer matters.",
+      "Check that git's top-level folder (<code>git rev-parse --show-toplevel</code>) <b>equals</b> the project root. If the project isn't its own repo, git silently walks up to a parent repo; the check catches that.",
+      "If any check fails, record <code>null</code> <b>plus the reason</b>, never a hash you can't vouch for.",
+    ],
+    demo: "git_sol",
+    trade: "The top-level check catches a rare case, but it's the most dangerous one: a wrong hash that looks right. That's worth one extra git call.",
+  },
+  4: {
+    idea: "Define the measurement window precisely, derive it from the request records, and keep raw facts out of the summary.",
+    steps: [
+      "Definition: <b>measured window = first measured submit → last token of the last measured request</b>. Write it in <code>docs/benchmark-methodology.md</code>.",
+      "Derive it from the records you already store, so there's no extra input the caller could get wrong. Warmup requests aren't in the measured records, so they're excluded automatically.",
+      "Store the run's phases (model load start/end, warmup end) as <b>raw timestamps at the top level</b> of the result. Model load time becomes its own metric instead of polluting throughput.",
+      "<code>summary</code> becomes 100% recomputable from raw data. <code>load()</code> never reads anything back from it.",
+    ],
+    demo: "wall_sol",
+    ba: [
+      J({ summary: { wall_time_s: 56.0, output_tokens_per_s: 107 }, requests: ["…"] }),
+      J({ phases_ns: { load_start: 0, load_end: 20000000000, warmup_end: 25000000000 }, requests: ["…"], summary: { measured_window_s: 30.0, output_tokens_per_s: 200, model_load_s: 20.0 } }),
+    ],
+    trade: "With an open-loop arrival process (Assignment 1), the window also includes idle gaps between arrivals. That's correct for throughput at a given load, but it's a different number from peak throughput. Name both clearly.",
+  },
+  5: {
+    idea: "Record requested length, actual length and why generation stopped. Force a fixed length for throughput runs, and refuse unfair comparisons.",
+    steps: [
+      "Each request records <code>max_tokens</code> (requested), <code>output_tokens</code> (actual) and <code>finish_reason</code> (<code>length</code>, <code>stop</code> or <code>error</code>).",
+      "For throughput benchmarks, force a fixed length: vLLM supports <code>ignore_eos</code>; in HF you can set the minimum new tokens equal to the maximum. Record that the option was on.",
+      "<code>summarize()</code> counts requests where <code>output_tokens ≠ max_tokens</code> and flags the run.",
+      "Comparison and plotting code refuses to put runs side by side when their output lengths differ, unless you explicitly allow it.",
+    ],
+    demo: "eos_sol",
+    trade: "Forcing a length makes runs comparable, but the text after the natural end is meaningless. That's fine for speed benchmarks and wrong for quality measurements (Phase 4 quantization quality checks must not use it).",
+  },
+  6: {
+    idea: "Capture the GPU's dynamic state before and after the run, sample it during the run, and decide deliberately whether to lock clocks.",
+    steps: [
+      "Snapshot <b>state</b>, not just specs, before and after: current SM and memory clocks, temperature, power draw, <b>throttle reasons</b>, and <b>other processes on the GPU</b>.",
+      "Warn (or refuse) if another process is using the GPU when the run starts.",
+      "The sampler (task 2.5) records the same fields every ~0.5–1 s during the run, stored raw in <code>device_samples</code>; the summary derives min clock, max temperature and throttled time.",
+      "Optionally lock clocks for repeatability. Record whether you did.",
+    ],
+    demo: "clock_sol",
+    trade: "Locked clocks give repeatable numbers but don't show real-world behaviour. A good default: locked for A/B kernel comparisons (Phase 3), unlocked for end-to-end runtime results (Phase 4), stated in the report.",
+  },
+  7: {
+    idea: "Two explicit run modes. Report runs require committed code; dev runs are allowed with a flag and record exactly what was different.",
+    steps: [
+      "<b>Report mode</b> refuses to run unless there's a commit and the tree is clean.",
+      "<b>Dev mode</b> runs on a dirty tree only with an explicit flag such as <code>--allow-dirty</code>.",
+      "Dirty runs record the list of changed files and a <b>hash of the diff</b>, so you can at least tell whether two dirty runs used the same code.",
+      "The mode itself is recorded in the result, and analysis can filter out dev runs.",
+    ],
+    demo: "dirty_sol",
+    trade: "Untracked files (new modules not yet added to git) don't appear in <code>git diff</code>. Decide whether to count them; a new untracked module can change behaviour just as much.",
+  },
+  8: {
+    idea: "Point at the sources of truth for each layer of the stack instead of hand-picking packages.",
+    steps: [
+      "Python packages: a <b>hash of <code>uv.lock</code></b> plus a full list of what's actually installed (the CUDA torch on the GPU VM is outside the lockfile).",
+      "CUDA libraries: <code>torch.version.cuda</code> and the installed <code>nvidia-*</code> packages, which the full list already includes.",
+      "Compiler: <code>nvcc --version</code> (needed in Phase 3).",
+      "Driver and hardware: NVML or <code>nvidia-smi</code>, plus the cloud instance type.",
+      "Project code: git commit, dirty flag and diff hash (#3, #7).",
+    ],
+    demo: "layers",
+    trade: "A full package list adds a few KB to every result file. That's cheap compared with not being able to explain a regression.",
+  },
+  9: {
+    idea: "Install the project into its own environment, so imports work from any directory, and get a real CLI command as a bonus.",
+    steps: [
+      "Remove <code>[tool.uv] package = false</code> and add a build backend that knows <code>benchmarks/</code> is the package.",
+      "uv then installs the project into <code>.venv</code> in editable mode: your edits apply immediately, and imports work from anywhere.",
+      "Add a <code>[project.scripts]</code> entry point. That's the CLI for task 0.6: <code>uv run benchmark …</code>.",
+      "Remove <code>pythonpath = [\".\"]</code> from the pytest config. If tests still pass, the install works.",
+    ],
+    demo: "cwd_sol",
+    ba: [
+      `[tool.uv]\npackage = false\n\n[tool.pytest.ini_options]\npythonpath = ["."]`,
+      `[build-system]\nrequires = ["hatchling"]\nbuild-backend = "hatchling.build"\n\n[tool.hatch.build.targets.wheel]\npackages = ["benchmarks"]\n\n[project.scripts]\nbenchmark = "benchmarks.cli:main"`,
+    ],
+    trade: "This is configuration, not learning material, so ask Claude to write it if you prefer. The cost is one build dependency.",
+  },
+  10: {
+    idea: "Compute every duration from two readings of the same clock. Never subtract readings taken on different machines.",
+    steps: [
+      "Client-observed metrics (TTFT, ITL, E2E) are measured <b>entirely on the client</b>: submit time and token arrival times all come from the client's clock.",
+      "Server-side timings (queue time, prefill time) are measured on the server and reported as <b>durations</b> (e.g. in the response or in <code>/metrics</code>), never as timestamps to subtract from client times.",
+      "Each result records <b>which clock</b> produced its timestamps, so analysis can't mix them by accident.",
+    ],
+    demo: "clocks_sol",
+    trade: "If you ever need to line up events across machines (e.g. a joint timeline), you need clock synchronization and its error bounds, a much bigger problem. Avoid needing it.",
+  },
+  11: {
+    idea: "Describe the machine, don't name it.",
+    steps: [
+      "Replace <code>hostname</code> with a <b>machine description</b>: chip/GPU model and memory, derived automatically.",
+      "On cloud VMs, add the <b>instance type</b> (from the provider's metadata service, or passed in by the session script).",
+      "If you need to tell your own machines apart, use a <b>label you choose</b> (e.g. from an environment variable), never the system hostname.",
+    ],
+    ba: [J({ hostname: "Nived.local", cpu: { model: "Apple M5" } }), J({ machine: { label: "m5-air-16gb", kind: "laptop", chip: "Apple M5", memory_gb: 16 } })],
+    trade: "Scan the rest of the snapshot with the same eye. File paths, for example, can include your username.",
+  },
+  12: {
+    idea: "Record the conditions that change speed on each platform, and warn when they're bad.",
+    steps: [
+      "macOS: power source and battery state (<code>pmset -g batt</code>), Low Power Mode (<code>pmset -g</code>), thermal state (<code>pmset -g therm</code>).",
+      "Linux GPU VM: CPU frequency governor (from <code>/sys/devices/system/cpu/…/scaling_governor</code>).",
+      "Capture before and after the run: a fanless Mac can start cool and finish hot.",
+      "Print a warning when conditions are known to hurt repeatability (on battery, Low Power Mode on).",
+    ],
+    demo: "power_sol",
+    trade: "Recording is cheap and always right. Refusing to run is stricter; for Mac runs (never in the report) a warning is enough.",
+  },
+  13: {
+    idea: "Keep the value and the reason separate, and distinguish \"doesn't apply here\" from \"failed\".",
+    steps: [
+      "The command helper returns a small result: <b>status</b> (ok / not_found / failed / timeout), the value, and for failures the exit code and the start of stderr.",
+      "The JSON stores <code>null</code> plus the status, so a reader can tell the cases apart.",
+      "Expected absences are marked <code>not_applicable</code> (e.g. <code>nvidia-smi</code> on a Mac), so they don't look like failures.",
+    ],
+    demo: "run_sol",
+    trade: "Store only the first few hundred characters of stderr. Error output can be long, and could include paths you'd rather not publish (#11).",
+  },
+  14: {
+    idea: "Parse once, at capture time: numbers with units in the key name, and null plus a reason for unavailable values.",
+    steps: ["Convert numeric fields to numbers, with the unit in the key name.", "Turn <code>[N/A]</code> / <code>[Not Supported]</code> into <code>null</code> with a status (#13)."],
+    ba: [J({ "memory.total": "23034", "power.limit": "[N/A]" }), J({ memory_total_mib: 23034, power_limit_w: null, power_limit_status: "not_supported" })],
+  },
+  15: {
+    idea: "Record a few facts about the Mac's GPU. Keep it short: this is learning data, not report data.",
+    steps: ["Chip name, GPU core count and unified memory size are enough for task 0.10's bandwidth exercise.", "macOS's <code>system_profiler SPDisplaysDataType -json</code> lists the GPU core count."],
+    ba: [J({ torch: { mps_available: true } }), J({ torch: { mps_available: true }, mac_gpu: { chip: "Apple M5", gpu_cores: "…", unified_memory_gb: 16 } })],
+  },
+  16: {
+    idea: "Test the failure paths you found in the experiments, without depending on what's installed on the test machine.",
+    steps: [
+      "Make external commands replaceable: route them through one helper (#13) that tests can swap out with pytest's <code>monkeypatch</code>.",
+      "Use pytest's <code>tmp_path</code> to build throwaway git repos: no commits, clean, dirty, nested inside another repo.",
+      "Run the snapshot from a different working directory in a test to lock in #3 and #9.",
+    ],
+    demo: "tests_sol",
+    trade: "Faking commands tests <i>your</i> logic, not the real tools. Keep one real-tool smoke test (the one that exists now) as well.",
+  },
+};
+
+/* ---------------------------------------------------------------- state */
+const KEY = "assignment0-review-v1";
+let st = { cur: 1, got: {}, quiz: {}, answers: {}, filter: null, sol: {} };
+try { const s = JSON.parse(localStorage.getItem(KEY)); if (s) st = { ...st, ...s }; } catch (e) {}
+function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} }
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+/* ---------------------------------------------------------------- render */
+function renderTop() {
+  const n = Object.values(st.got).filter(Boolean).length;
+  $("#prog").innerHTML = `<b>${n}</b> of ${F.length} understood`;
+  $("#progbar").style.width = (n / F.length) * 100 + "%";
+  $("#principles").innerHTML = Object.entries(PRINCIPLES).map(([k, p]) =>
+    `<button class="pr ${st.filter === k ? "on" : ""}" data-pr="${k}"><b>${p.t}</b><span>${p.d}</span></button>`).join("");
+}
+function renderNav() {
+  let html = "";
+  for (const [k, s] of Object.entries(SEV)) {
+    html += `<div class="grp">${s.t}</div>`;
+    html += F.filter(f => f.sev === k).map(f =>
+      `<button class="item ${st.cur === f.n ? "on" : ""} ${st.filter && !f.pr.includes(st.filter) ? "dim" : ""}" data-go="${f.n}">
+        <span class="sev ${s.c}"></span><span class="n">${f.n}</span><span class="t">${f.title}</span>${st.got[f.n] ? '<span class="ck">✓</span>' : ""}</button>`).join("");
+  }
+  html += `<div class="grp">Your turn</div><button class="item ${st.cur === 0 ? "on" : ""}" data-go="0"><span class="sev" style="background:var(--accent)"></span><span class="n">→</span><span class="t">Task 0.2: design answers for #1</span></button>`;
+  $("#nav").innerHTML = html;
+}
+function renderMain() {
+  const el = $("#main");
+  if (st.cur === 0) return renderTask(el);
+  const f = F.find(x => x.n === st.cur), s = SEV[f.sev];
+  const q = f.quiz, picked = st.quiz[f.n];
+  el.innerHTML = `
+    <div class="meta"><span class="pill"><span class="sev ${s.c}" style="margin:0"></span>${s.t}</span><span class="pill">${f.file} · ${f.where}</span>${f.pr.map(p => `<span class="pill">${PRINCIPLES[p].t}</span>`).join("")}</div>
+    <h2>#${f.n} ${f.title}</h2>
+    <h3>What's happening</h3>${f.simple}
+    <div class="box why"><b>Why it matters.</b> ${f.why}</div>
+    ${f.note ? `<div class="box note">${f.note}</div>` : ""}
+    ${f.demo ? `<h3>Try it</h3><div class="demo" id="demo"></div>` : ""}
+    <h3>How to think about the fix</h3>
+    <div class="think"><p style="margin:0">Answer these for yourself before looking at the hint:</p><ol>${f.think.map(t => `<li>${t}</li>`).join("")}</ol></div>
+    <details class="hint"><summary>Show the direction (after you've thought about it)</summary><div>${f.hint}</div></details>
+    ${q ? `<h3>Check yourself</h3><div class="quiz"><p style="margin:0 0 4px;font-weight:600">${q.q}</p>${q.o.map((o, i) => {
+      const cls = picked == null ? "" : o[1] ? "ok" : i === picked ? "no" : "";
+      return `<button class="opt ${cls}" data-q="${i}">${o[0]}</button>${picked === i ? `<div class="why">${o[2]}</div>` : ""}`;
+    }).join("")}</div>` : ""}
+    ${renderSol(f.n)}
+    <div class="foot">
+      <button class="b" data-go="${prevN()}" ${prevN() == null ? "disabled" : ""}>← Previous</button>
+      <button class="b ${st.got[f.n] ? "got" : "primary"}" data-got="${f.n}">${st.got[f.n] ? "✓ Understood" : "I understand this one"}</button>
+      <button class="b" data-go="${nextN()}">${nextN() === 0 ? "Your turn →" : "Next →"}</button>
+    </div>`;
+  if (f.demo) DEMOS[f.demo]($("#demo"));
+  const s2 = SOL[f.n];
+  if (s2 && st.sol[f.n] && s2.demo) DEMOS[s2.demo]($("#soldemo"));
+}
+
+function renderSol(n) {
+  const s = SOL[n];
+  if (!s) return "";
+  if (!st.sol[n]) return `<button class="b solbtn" data-sol="${n}">Show the proposed solution</button><p class="muted" style="font-size:12.5px;text-align:center;margin-top:6px">Try the questions above first. You'll learn more by comparing than by reading.</p>`;
+  const esc = t => t.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  return `<div class="sol">
+    <div class="hd">✓ Proposed solution <button class="link" data-sol="${n}" style="margin-left:auto;text-transform:none;letter-spacing:0">hide</button></div>
+    <div class="idea">${s.idea}</div>
+    <ol class="steps">${s.steps.map(x => `<li>${x}</li>`).join("")}</ol>
+    ${s.demo ? `<div class="demo" id="soldemo"></div>` : ""}
+    ${s.ba ? `<div class="ba"><div class="bef"><b>Before</b><pre>${esc(s.ba[0])}</pre></div><div class="aft"><b>After</b><pre>${esc(s.ba[1])}</pre>${s.after2 ? `<pre>${esc(s.after2)}</pre>` : ""}</div></div>` : ""}
+    ${s.trade ? `<div class="trade"><b>Trade-off to think about:</b> ${s.trade}</div>` : ""}
+    <p class="yours">This is one reasonable design, not the only one. If your answers differ, argue for yours. Implementing it is your job in task 0.2.</p>
+  </div>`;
+}
+function order() { return F.map(f => f.n); }
+function prevN() { const o = order(), i = o.indexOf(st.cur); return i > 0 ? o[i - 1] : null; }
+function nextN() { const o = order(), i = o.indexOf(st.cur); return i < o.length - 1 ? o[i + 1] : 0; }
+
+function renderTask(el) {
+  const qs = [
+    "What is one observation from a runtime: a token, a chunk, or a whole response? What do you record for each?",
+    "For a non-streaming request, what can you still measure honestly, and what must be recorded as unknown?",
+    "How does summarize() keep non-streaming requests from contaminating the TTFT and ITL distributions, without hiding that they exist?",
+    "Now compare with the proposed solution for #1. Where does your design differ, and which do you prefer? Why?",
+  ];
+  el.innerHTML = `<div class="meta"><span class="pill">Task 0.2</span></div>
+    <h2>Your turn: design the fix for #1</h2>
+    <p>Answer questions 1–3 <b>before</b> opening the proposed solution for #1, then answer question 4. Your answers are saved in this browser. Copy them and send them to Claude for review before writing any code.</p>
+    ${qs.map((q, i) => `<div class="qa"><label>${i + 1}. ${q}</label><textarea data-ans="${i}" placeholder="Your answer…">${(st.answers[i] || "").replace(/</g, "&lt;")}</textarea></div>`).join("")}
+    <div class="foot"><button class="b" data-go="16">← Back to findings</button><button class="b primary" data-copy>Copy answers</button></div>`;
+}
+
+function render() { renderTop(); renderNav(); renderMain(); }
+
+/* ---------------------------------------------------------------- demos */
+const DEMOS = {};
+
+DEMOS.stream = (el, opts = {}) => {
+  const s = { mode: opts.proposed ? "ns" : "s1", p: 200, d: 20, n: 16 };
+  const modes = [["s1", "Streams 1 token per event"], ["s4", "Streams 4 tokens per event"], ["ns", "Not streaming"]];
+  el.innerHTML = `<div class="lbl">One request, as the client sees it (illustrative timings)</div>
+    <div class="ctrl"><div class="seg">${modes.map(([k, l]) => `<button data-m="${k}">${l}</button>`).join("")}</div></div>
+    <div class="ctrl">
+      <label>Prefill <input type="range" min="50" max="600" step="10" data-k="p"><span data-v="p"></span></label>
+      <label>Decode / token <input type="range" min="5" max="60" step="1" data-k="d"><span data-v="d"></span></label>
+      <label>Output tokens <input type="range" min="4" max="48" step="4" data-k="n"><span data-v="n"></span></label>
+      <button class="b" data-play>▶ Play</button>
+    </div>
+    <div class="tl" data-tl></div>
+    <div class="legend"><span><i style="background:var(--muted);opacity:.55"></i>tokens the engine actually produced</span><span><i style="background:var(--warn-soft)"></i>prefill</span><span><i style="background:var(--accent)"></i>events the client receives (with token count)</span></div>
+    <div class="tblwrap"><table class="cmp" data-t></table></div>`;
+  const ms = v => v == null ? "—" : Math.round(v) + " ms";
+  function compute() {
+    const tok = Array.from({ length: s.n }, (_, i) => s.p + i * s.d);
+    let ev;
+    if (s.mode === "s1") ev = tok.map(t => ({ t, k: 1 }));
+    else if (s.mode === "s4") { ev = []; for (let i = 3; i < s.n; i += 4) ev.push({ t: tok[i], k: 4 }); }
+    else ev = [{ t: tok[s.n - 1], k: s.n }];
+    const times = ev.map(e => e.t);
+    const gaps = times.slice(1).map((t, i) => t - times[i]);
+    const schema = { out: times.length, ttft: times[0], e2e: times[times.length - 1], itl: gaps.length ? gaps.reduce((a, b) => a + b) / gaps.length : null, tpot: times.length > 1 ? (times[times.length - 1] - times[0]) / (times.length - 1) : null };
+    const truth = { out: s.n, ttft: s.p, e2e: tok[s.n - 1], itl: s.d, tpot: s.d };
+    return { tok, ev, schema, truth };
+  }
+  function draw(reveal = Infinity) {
+    const { tok, ev, schema, truth } = compute();
+    const max = tok[tok.length - 1] * 1.06;
+    const x = t => (t / max) * 100;
+    $("[data-tl]", el).innerHTML = `<div class="axis"></div><div class="pre" style="left:0;width:${x(s.p)}%"></div>
+      <span class="tag" style="left:0;top:0">submit (t=0)</span>
+      ${tok.map(t => `<div class="tok" style="left:${x(t)}%"></div>`).join("")}
+      ${ev.map(e => `<div class="ev ${e.t > reveal ? "hidden" : ""}" style="left:${x(e.t)}%">${e.k}</div>`).join("")}
+      <div class="cursor" data-cur></div>`;
+    const honest = {
+      s1: { out: s.n, ttft: ms(truth.ttft), e2e: ms(truth.e2e), itl: ms(truth.itl), tpot: ms(truth.tpot) },
+      s4: { out: s.n, ttft: ms(schema.ttft) + " (first chunk; true first token is hidden inside it)", e2e: ms(truth.e2e), itl: "chunk gap ÷ tokens in chunk ≈ " + ms(truth.itl), tpot: ms(truth.tpot) },
+      ns: opts.proposed ? { out: s.n, ttft: "unknown: excluded from TTFT (delivery=none)", e2e: ms(truth.e2e), itl: "unknown: excluded", tpot: "unknown: excluded" } : { out: s.n, ttft: "unknown", e2e: ms(truth.e2e), itl: "unknown", tpot: "unknown" },
+    }[s.mode];
+    const row = (name, tv, sv, hv, bad) => `<tr><td><b>${name}</b></td><td>${tv}</td><td class="${bad ? "wrong" : "right"}">${sv}${bad ? " ✗" : " ✓"}</td><td class="${String(hv).startsWith("unknown") ? "unk" : ""}">${hv}</td></tr>`;
+    const near = (a, b) => a != null && Math.abs(a - b) < 0.5;
+    $("[data-t]", el).innerHTML = `<tr><th>Metric</th><th>What really happened</th><th>What the current schema reports</th><th>${opts.proposed ? "Proposed schema reports" : "What you could honestly record"}</th></tr>
+      ${row("Output tokens", truth.out, schema.out, honest.out, schema.out !== truth.out)}
+      ${row("TTFT", ms(truth.ttft), ms(schema.ttft), honest.ttft, !near(schema.ttft, truth.ttft))}
+      ${row("ITL (avg)", ms(truth.itl), ms(schema.itl), honest.itl, !near(schema.itl, truth.itl))}
+      ${row("TPOT", ms(truth.tpot), ms(schema.tpot), honest.tpot, !near(schema.tpot, truth.tpot))}
+      ${row("E2E", ms(truth.e2e), ms(schema.e2e), honest.e2e, !near(schema.e2e, truth.e2e))}`;
+    $$("[data-m]", el).forEach(b => b.classList.toggle("on", b.dataset.m === s.mode));
+    for (const k of ["p", "d", "n"]) { $(`[data-k=${k}]`, el).value = s[k]; $(`[data-v=${k}]`, el).textContent = k === "n" ? s[k] : s[k] + " ms"; }
+    return max;
+  }
+  el.addEventListener("click", e => { const m = e.target.closest("[data-m]"); if (m) { s.mode = m.dataset.m; draw(); } });
+  el.addEventListener("input", e => { const k = e.target.dataset.k; if (k) { s[k] = +e.target.value; draw(); } });
+  $("[data-play]", el).onclick = () => {
+    const max = draw(-1), dur = Math.min(5000, max * 4), t0 = performance.now();
+    const cur = $("[data-cur]", el); cur.style.display = "block";
+    (function step(now) {
+      const t = ((now - t0) / dur) * max;
+      cur.style.left = Math.min(100, (t / max) * 100) + "%";
+      $$(".ev", el).forEach(ev => { if (parseFloat(ev.style.left) <= (t / max) * 100) ev.classList.remove("hidden"); });
+      if (t < max) requestAnimationFrame(step); else cur.style.display = "none";
+    })(t0);
+  };
+  draw();
+};
+
+DEMOS.fork = el => {
+  let mode = "bad", step = 0;
+  const S = {
+    bad: [
+      ["Benchmark process starts. Nothing has touched CUDA yet.", ["Main process", "Python running. No CUDA.", ""], ["Worker", "", "ghost"], ["GPU", "Idle", ""]],
+      ["capture_environment() → _torch_info() → torch.cuda.get_device_properties(0)", ["Main process", "CUDA initialized here, as a side effect of taking a snapshot", "hot"], ["Worker", "", "ghost"], ["GPU", "Context created for main process; memory reserved", "hot"]],
+      ["The runner starts a worker with fork (Linux default in Python 3.12). The worker is a copy of the main process, including its half of the CUDA setup.", ["Main process", "CUDA initialized", "hot"], ["Worker", "Copy of main, with copied CUDA state", "hot"], ["GPU", "Context belongs to the main process only", "hot"]],
+      ["The worker tries to use the GPU…\nRuntimeError: Cannot re-initialize CUDA in forked subprocess.", ["Main process", "CUDA initialized", "hot"], ["Worker", "✗ Crashed", "badp"], ["GPU", "Unused by the worker", ""]],
+    ],
+    good: [
+      ["Benchmark process starts. Nothing has touched CUDA yet.", ["Main process", "Python running. No CUDA.", ""], ["Worker", "", "ghost"], ["GPU", "Idle", ""]],
+      ["capture_environment() asks the driver for GPU info through NVML / nvidia-smi: a separate tool, outside this process's CUDA.", ["Main process", "Still no CUDA in this process ✓", "okp"], ["Worker", "", "ghost"], ["GPU", "Queried, not initialized", ""]],
+      ["The runner starts a worker with fork. It's a clean copy with no CUDA state.", ["Main process", "No CUDA", "okp"], ["Worker", "Clean copy, no CUDA", "okp"], ["GPU", "Idle", ""]],
+      ["The worker initializes CUDA for itself and runs the model.", ["Main process", "No CUDA", "okp"], ["Worker", "✓ Running on the GPU", "okp"], ["GPU", "Context created for the worker", "okp"]],
+    ],
+  };
+  el.innerHTML = `<div class="lbl">Step through what happens on the GPU VM</div>
+    <div class="ctrl"><div class="seg"><button data-mode="bad">Snapshot uses torch.cuda</button><button data-mode="good">Snapshot asks the driver from outside</button></div>
+    <button class="b" data-back>← Back</button><button class="b primary" data-next>Next step →</button><span class="muted" data-step></span></div>
+    <div class="procs" data-procs></div><div class="log" data-log></div>`;
+  function draw() {
+    const cur = S[mode][step];
+    $("[data-procs]", el).innerHTML = cur.slice(1).map(([t, body, cls]) => `<div class="proc ${cls}"><b>${t}</b>${body}</div>`).join("");
+    $("[data-log]", el).textContent = cur[0];
+    $("[data-step]", el).textContent = `Step ${step + 1} of ${S[mode].length}`;
+    $$("[data-mode]", el).forEach(b => b.classList.toggle("on", b.dataset.mode === mode));
+  }
+  el.addEventListener("click", e => {
+    const t = e.target;
+    if (t.dataset.mode) { mode = t.dataset.mode; step = 0; }
+    else if ("next" in t.dataset) step = Math.min(S[mode].length - 1, step + 1);
+    else if ("back" in t.dataset) step = Math.max(0, step - 1);
+    else return;
+    draw();
+  });
+  draw();
+};
+
+DEMOS.git = el => {
+  let where = "root", fixed = false;
+  const W = {
+    root: { dir: "~/Developer/llm-inference-performance", label: "the project repo" },
+    home: { dir: "~", label: "your home directory" },
+    other: { dir: "~/Developer/ForgeML", label: "your other project" },
+  };
+  el.innerHTML = `<div class="lbl">Where do you launch the benchmark from?</div>
+    <div class="ctrl"><div class="seg">${Object.entries(W).map(([k, w]) => `<button data-w="${k}">${w.label}</button>`).join("")}</div>
+    <label><input type="checkbox" data-fix> git anchored to the file's own location</label></div>
+    <div class="term" data-term></div><div data-verdict></div>`;
+  function draw() {
+    const truth = "a1b2c3d (llm-inference-performance)";
+    let rec, v;
+    if (fixed || where === "root") { rec = '<span class="g">"a1b2c3d"</span>'; v = ["ok", "Correct: the hash of the code that actually ran."]; }
+    else if (where === "home") { rec = '<span class="y">null</span>'; v = ["warn", "Missing, but honest: anyone reading the result sees provenance is missing."]; }
+    else { rec = '<span class="r">"9f8e7d6"</span>'; v = ["bad", "Wrong but looks valid: this is ForgeML's commit. Checking it out later gives you different code."]; }
+    $("[data-term]", el).innerHTML = `<span class="c">$</span> cd ${W[where].dir}\n<span class="c">$</span> benchmark run …\n<span class="c"># env.py records:</span>  "git": { "commit": ${rec} }\n<span class="c"># code that actually ran: ${truth}</span>`;
+    $("[data-verdict]", el).innerHTML = `<div class="verdict ${v[0]}">${v[1]}</div>`;
+    $$("[data-w]", el).forEach(b => b.classList.toggle("on", b.dataset.w === where));
+  }
+  el.addEventListener("click", e => { if (e.target.dataset.w) { where = e.target.dataset.w; draw(); } });
+  $("[data-fix]", el).onchange = e => { fixed = e.target.checked; draw(); };
+  draw();
+};
+
+DEMOS.wall = el => {
+  const seg = [["load", "Model load", 20, "#c7d2fe"], ["warm", "Warmup", 5, "#fde68a"], ["meas", "Measured requests", 30, "#bbf7d0"], ["save", "Save results", 1, "#e2e8f0"]];
+  const on = { load: false, warm: false, meas: true, save: false };
+  const tokens = 6000;
+  el.innerHTML = `<div class="lbl">Which stretch of time counts as "wall time"? (illustrative: 6,000 tokens generated in the measured part)</div>
+    <div class="ctrl">${seg.map(([k, l]) => `<label><input type="checkbox" data-s="${k}">${l}</label>`).join("")}</div>
+    <div class="segbar" data-bar></div>
+    <div style="display:flex;gap:28px;flex-wrap:wrap;align-items:baseline"><div><div class="muted" style="font-size:12px">Reported throughput</div><div class="big" data-thr></div></div><div><div class="muted" style="font-size:12px">Throughput of the measured part only</div><div class="big" style="color:var(--ok)">${tokens / 30} tok/s</div></div></div>
+    <p class="muted" style="font-size:13px;margin-top:8px">Same run, same tokens. The number depends only on an undocumented choice made by whoever calls <code>summarize()</code>.</p>`;
+  function draw() {
+    const total = seg.reduce((a, s) => a + s[2], 0);
+    $("[data-bar]", el).innerHTML = seg.map(([k, l, t, c]) => `<div class="${on[k] ? "" : "off"}" style="flex:${t / total};background:${c};color:#0f172a">${l}<br>${t}s</div>`).join("");
+    const secs = seg.filter(s => on[s[0]]).reduce((a, s) => a + s[2], 0);
+    $("[data-thr]", el).textContent = secs ? Math.round(tokens / secs) + " tok/s" : "÷ 0";
+    $("[data-thr]", el).style.color = secs === 30 && on.meas ? "var(--ok)" : "var(--bad)";
+    seg.forEach(([k]) => { $(`[data-s=${k}]`, el).checked = on[k]; });
+  }
+  el.addEventListener("change", e => { const k = e.target.dataset.s; if (k) { on[k] = e.target.checked; draw(); } });
+  draw();
+};
+
+DEMOS.eos = el => {
+  const p = 200, d = 20, want = 256;
+  let k = 64;
+  el.innerHTML = `<div class="lbl">Runtime A and B are equally fast (illustrative: 200 ms prefill, 20 ms per token). You asked both for 256 tokens.</div>
+    <div class="ctrl"><label>B stops early after <input type="range" min="16" max="256" step="16" data-k> <b data-v></b> tokens</label></div>
+    <div class="tblwrap"><table class="cmp" data-t></table></div><div data-verdict></div>`;
+  function draw() {
+    const e2e = n => p + (n - 1) * d;
+    const A = { n: want, e2e: e2e(want) }, B = { n: k, e2e: e2e(k) };
+    const tps = r => (r.n / (r.e2e / 1000)).toFixed(1);
+    $("[data-v]", el).textContent = k;
+    $("[data-k]", el).value = k;
+    $("[data-t]", el).innerHTML = `<tr><th></th><th>A (ran to 256)</th><th>B (stopped at ${k})</th></tr>
+      <tr><td><b>E2E latency</b></td><td>${A.e2e} ms</td><td class="${k < want ? "wrong" : ""}">${B.e2e} ms</td></tr>
+      <tr><td><b>Requests per second (one at a time)</b></td><td>${(1000 / A.e2e).toFixed(2)}</td><td class="${k < want ? "wrong" : ""}">${(1000 / B.e2e).toFixed(2)}</td></tr>
+      <tr><td><b>Tokens/s for the request</b></td><td>${tps(A)}</td><td class="${k < want ? "wrong" : ""}">${tps(B)}</td></tr>`;
+    $("[data-verdict]", el).innerHTML = k < want
+      ? `<div class="verdict bad">B looks ${(A.e2e / B.e2e).toFixed(1)}× faster on E2E, but it did ${Math.round((k / want) * 100)}% of the work. Notice tokens/s for B is <i>lower</i>: prefill is a bigger share of a short request. Every column is "wrong", in different directions.</div>`
+      : `<div class="verdict ok">Same work, same numbers. This is the only fair comparison.</div>`;
+  }
+  el.addEventListener("input", e => { if ("k" in e.target.dataset) { k = +e.target.value; draw(); } });
+  draw();
+};
+
+DEMOS.clock = el => {
+  let m = 0;
+  const clockAt = t => (t < 2 ? 100 : Math.max(78, 100 - (t - 2) * 4.5));
+  el.innerHTML = `<div class="lbl">A long run on a GPU that heats up (illustrative curve, not real data)</div>
+    <div class="ctrl"><label>Minutes into the run <input type="range" min="0" max="10" step="0.5" data-m> <b data-v></b></label></div>
+    <svg viewBox="0 0 600 170" width="100%" height="170" data-svg></svg>
+    <div class="tblwrap"><table class="cmp" data-t></table></div>`;
+  function draw() {
+    const W = 600, H = 170, L = 40, R = 10, T = 10, B = 26;
+    const x = t => L + (t / 10) * (W - L - R), y = c => T + ((100 - c) / 30) * (H - T - B);
+    let path = ""; for (let t = 0; t <= 10.001; t += 0.1) path += (path ? "L" : "M") + x(t).toFixed(1) + "," + y(clockAt(t)).toFixed(1);
+    $("[data-svg]", el).innerHTML = `
+      <line x1="${L}" y1="${y(100)}" x2="${W - R}" y2="${y(100)}" stroke="var(--muted)" stroke-dasharray="4 4"/>
+      <text x="${W - R}" y="${y(100) - 4}" text-anchor="end">env.py records "max clock" (spec)</text>
+      <path d="${path}" fill="none" stroke="var(--accent)" stroke-width="2.5"/>
+      <line x1="${x(m)}" y1="${T}" x2="${x(m)}" y2="${H - B}" stroke="var(--bad)" stroke-width="2"/>
+      <circle cx="${x(m)}" cy="${y(clockAt(m))}" r="5" fill="var(--bad)"/>
+      ${[0, 2, 4, 6, 8, 10].map(t => `<text x="${x(t)}" y="${H - 8}" text-anchor="middle">${t} min</text>`).join("")}
+      ${[100, 90, 80].map(c => `<text x="${L - 6}" y="${y(c) + 4}" text-anchor="end">${c}%</text>`).join("")}`;
+    $("[data-v]", el).textContent = m + " min";
+    $("[data-m]", el).value = m;
+    const c = clockAt(m);
+    $("[data-t]", el).innerHTML = `<tr><th></th><th>What env.py says</th><th>What the GPU is doing now</th></tr>
+      <tr><td><b>SM clock</b></td><td>100% of max (spec, captured once at the start)</td><td class="${c < 100 ? "wrong" : "right"}">${c.toFixed(0)}% of max</td></tr>
+      <tr><td><b>A clock-bound kernel</b></td><td>assumed full speed</td><td class="${c < 100 ? "wrong" : "right"}">${(100 / c).toFixed(2)}× slower than at the start</td></tr>`;
+  }
+  el.addEventListener("input", e => { if ("m" in e.target.dataset) { m = +e.target.value; draw(); } });
+  draw();
+};
+
+DEMOS.dirty = el => {
+  const opts = [
+    ["Run normally. dirty: true is recorded, that's enough.", "bad", "The flag says <i>something</i> changed, not <i>what</i>. The result can't be reproduced, yet it looks like any other result."],
+    ["Refuse to run a report-grade benchmark; allow dev runs only with an explicit flag that is recorded in the result.", "ok", "Yes. Report numbers always come from committed code. Dev runs stay easy, and the result says honestly that it came from uncommitted changes."],
+    ["Commit everything automatically before running.", "warn", "It makes the result traceable, but creates commits you didn't review or describe. Too much hidden behaviour for a measuring tool."],
+    ["Stash or discard local changes before running.", "bad", "This would run different code from what you were working on, or destroy your work."],
+  ];
+  el.innerHTML = `<div class="lbl">Your snapshot says commit: null, dirty: true. You're about to run a benchmark for the report. The runner should…</div>
+    ${opts.map((o, i) => `<button class="chip" style="width:100%;margin:5px 0" data-o="${i}">${o[0]}</button>`).join("")}<div data-verdict></div>`;
+  el.addEventListener("click", e => {
+    const b = e.target.closest("[data-o]"); if (!b) return;
+    const o = opts[+b.dataset.o];
+    $$("[data-o]", el).forEach(x => x.classList.remove("rev-y", "rev-n"));
+    b.classList.add(o[1] === "ok" ? "rev-y" : "rev-n");
+    $("[data-verdict]", el).innerHTML = `<div class="verdict ${o[1]}">${o[2]}</div>`;
+  });
+};
+
+DEMOS.pkgs = el => {
+  const items = [
+    ["torch version", "incl. +cu124 build tag", true], ["transformers / vllm", "Python packages", true], ["NVIDIA driver", "from nvidia-smi", true],
+    ["CUDA version torch was built with", "torch.version.cuda", true], ["cuDNN", "via torch", true],
+    ["cuBLAS", "the GEMM library behind most matmuls", false], ["flash-attn / xformers", "attention kernels", false],
+    ["Quantization libraries", "AWQ, GPTQ, bitsandbytes", false], ["nvcc version", "compiles your Phase 3 kernels", false],
+    ["Every other installed package", "anything not in the hand-picked list", false], ["Cloud instance type", "g6.xlarge vs g5.xlarge…", false],
+  ];
+  const guess = {};
+  let revealed = false;
+  el.innerHTML = `<div class="lbl">Click the ones you think env.py records today, then reveal</div>
+    <div class="chips" data-c></div><div class="ctrl" style="margin-top:10px"><button class="b primary" data-rev>Reveal</button><button class="b" data-reset>Reset</button><span data-score></span></div>`;
+  function draw() {
+    $("[data-c]", el).innerHTML = items.map(([t, s, rec], i) => {
+      let cls = guess[i] ? "guess-y" : "";
+      if (revealed) cls = rec ? "rev-y" : "rev-n";
+      return `<button class="chip ${cls}" data-i="${i}">${revealed ? (rec ? "✓ " : "✗ ") : guess[i] ? "● " : ""}${t}<small>${s}</small></button>`;
+    }).join("");
+    const right = items.filter(([, , rec], i) => !!guess[i] === rec).length;
+    $("[data-score]", el).innerHTML = revealed ? `You got <b>${right}/${items.length}</b>. Green = recorded, red = missing.` : "";
+  }
+  el.addEventListener("click", e => {
+    const c = e.target.closest("[data-i]");
+    if (c && !revealed) { guess[c.dataset.i] = !guess[c.dataset.i]; draw(); }
+    if (e.target.closest("[data-rev]")) { revealed = true; draw(); }
+    if (e.target.closest("[data-reset]")) { revealed = false; for (const k in guess) delete guess[k]; draw(); }
+  });
+  draw();
+};
+
+DEMOS.cwd = el => {
+  let where = "root";
+  el.innerHTML = `<div class="lbl">Run <code>python -m benchmarks.env</code> from…</div>
+    <div class="ctrl"><div class="seg"><button data-w="root">the repo root</button><button data-w="home">~ (home)</button><button data-w="ssh">an SSH session script on the GPU VM</button></div></div>
+    <div class="term" data-term></div>
+    <h3>Fix options and their costs</h3>
+    <div class="tblwrap"><table class="cmp"><tr><th>Option</th><th>Good</th><th>Cost</th></tr>
+      <tr><td>Always <code>cd</code> to the repo first</td><td>No changes</td><td>Relies on every script and person remembering. Fails silently in new scripts.</td></tr>
+      <tr><td>Set <code>PYTHONPATH</code> in scripts</td><td>Small change</td><td>Hidden setup that lives outside the project; easy to forget on a new machine.</td></tr>
+      <tr><td>Install the project as a package</td><td>Works from anywhere; gives a real CLI command (task 0.6); standard</td><td>A small <code>pyproject.toml</code> change and a build backend</td></tr>
+    </table></div>`;
+  function draw() {
+    const out = {
+      root: `<span class="c">~/Developer/llm-inference-performance $</span> python -m benchmarks.env\n<span class="g">{ "captured_at": …, "python": "3.12.14", … }</span>`,
+      home: `<span class="c">~ $</span> python -m benchmarks.env\n<span class="r">ModuleNotFoundError: No module named 'benchmarks'</span>\n<span class="c"># sys.path[0] is ~, which has no benchmarks/ folder</span>`,
+      ssh: `<span class="c">ubuntu@gpu-vm:~ $</span> ./run_session.sh\n<span class="c">  … 6 minutes of setup on a paid GPU …</span>\n<span class="r">ModuleNotFoundError: No module named 'benchmarks'</span>`,
+    }[where];
+    $("[data-term]", el).innerHTML = out;
+    $$("[data-w]", el).forEach(b => b.classList.toggle("on", b.dataset.w === where));
+  }
+  el.addEventListener("click", e => { if (e.target.dataset.w) { where = e.target.dataset.w; draw(); } });
+  draw();
+};
+
+DEMOS.clocks = el => {
+  let macUp = 259200, vmUp = 7200; // seconds since each machine's clock started
+  el.innerHTML = `<div class="lbl">Each machine's perf_counter starts from its own arbitrary point (illustrative)</div>
+    <div class="ctrl"><button class="b" data-rr>Restart the VM (its clock starts over)</button></div>
+    <div class="tblwrap"><table class="cmp" data-t></table></div><div data-verdict></div>`;
+  function draw() {
+    const real = 1000, ttft = 0.25;
+    const sub = real + macUp, first = real + ttft + vmUp;
+    $("[data-t]", el).innerHTML = `<tr><th>Event</th><th>Machine</th><th>perf_counter reading</th></tr>
+      <tr><td>Request submitted</td><td>Mac (client)</td><td>${sub.toFixed(3)} s</td></tr>
+      <tr><td>First token produced</td><td>GPU VM (server)</td><td>${first.toFixed(3)} s</td></tr>
+      <tr><td><b>"TTFT" = server − client</b></td><td></td><td class="wrong">${(first - sub).toFixed(3)} s</td></tr>
+      <tr><td><b>Real TTFT</b></td><td></td><td class="right">${ttft.toFixed(3)} s</td></tr>`;
+    $("[data-verdict]", el).innerHTML = `<div class="verdict bad">The subtraction mostly measures the difference between when the two clocks started. It can even be negative.</div>`;
+  }
+  $("[data-rr]", el).onclick = () => { vmUp = Math.round(Math.random() * 400000); draw(); };
+  draw();
+};
+
+DEMOS.host = el => {
+  el.innerHTML = `<div class="lbl">Your snapshot, as anyone on GitHub would see it. Hover or tap each field: useful, or private?</div>
+    <pre data-j></pre><div data-verdict></div>`;
+  const fields = [
+    ['"captured_at": "2026-10-10T06:25:52Z"', "ok", "Useful: when the run happened."],
+    ['"hostname": "Nived.local"', "bad", "Private and useless: it names you and your machine, and says nothing about the hardware."],
+    ['"os": { "platform": "macOS-26.7.1-arm64" }', "ok", "Useful: OS and architecture."],
+    ['"cpu": { "model": "Apple M5", "memory_bytes": 17179869184 }', "ok", "Useful: the kind of machine. This is what a reader needs, not the name."],
+    ['"git": { "commit": null, "dirty": true }', "warn", "Useful in principle, broken in practice (see #3 and #7)."],
+  ];
+  $("[data-j]", el).innerHTML = "{\n" + fields.map((f, i) => `  <span data-f="${i}" style="cursor:pointer;border-radius:4px;padding:1px 2px">${f[0].replace(/</g, "&lt;")}</span>`).join(",\n") + "\n}";
+  const show = i => {
+    const f = fields[i];
+    $$("[data-f]", el).forEach(s => (s.style.background = ""));
+    $(`[data-f="${i}"]`, el).style.background = f[1] === "bad" ? "var(--bad-soft)" : f[1] === "ok" ? "var(--ok-soft)" : "var(--warn-soft)";
+    $("[data-verdict]", el).innerHTML = `<div class="verdict ${f[1]}">${f[2]}</div>`;
+  };
+  el.addEventListener("mouseover", e => { const f = e.target.closest("[data-f]"); if (f) show(+f.dataset.f); });
+  el.addEventListener("click", e => { const f = e.target.closest("[data-f]"); if (f) show(+f.dataset.f); });
+};
+
+DEMOS.power = el => {
+  const c = { ac: true, low: false, hot: false };
+  el.innerHTML = `<div class="lbl">Change the Mac's conditions</div>
+    <div class="ctrl"><label><input type="checkbox" data-c="ac" checked> On the charger</label><label><input type="checkbox" data-c="low"> Low Power Mode</label><label><input type="checkbox" data-c="hot"> After 10 minutes of heavy load (warm, fanless)</label></div>
+    <div class="procs" style="grid-template-columns:1fr 1fr"><div class="proc" data-real></div><div class="proc" data-env></div></div>`;
+  function draw() {
+    const worse = !c.ac || c.low || c.hot;
+    $("[data-real]", el).className = "proc " + (worse ? "hot" : "okp");
+    $("[data-real]", el).innerHTML = `<b>Reality</b>${c.ac ? "AC power" : "Battery"} · Low Power ${c.low ? "on" : "off"} · ${c.hot ? "warm" : "cool"}<br>${worse ? "Likely running slower than its best" : "Best-case conditions"}`;
+    $("[data-env]", el).className = "proc";
+    $("[data-env]", el).innerHTML = `<b>What env.py records</b><code>"cpu": { "model": "Apple M5", "logical_cores": 10, … }</code><br><span class="muted">Identical in all 8 combinations.</span>`;
+  }
+  el.addEventListener("change", e => { const k = e.target.dataset.c; if (k) { c[k] = e.target.checked; draw(); } });
+  draw();
+};
+
+DEMOS.run = el => {
+  let sc = "ok";
+  const S = {
+    ok: ["nvidia-smi works", '<span class="g">[{ "name": "NVIDIA L4", … }]</span>'],
+    missing: ["nvidia-smi not installed", '<span class="y">null</span>'],
+    crash: ["driver broken (non-zero exit)", '<span class="y">null</span>'],
+    hang: ["GPU hung (times out after 10 s)", '<span class="y">null</span>'],
+  };
+  el.innerHTML = `<div class="lbl">What happened on the GPU VM?</div>
+    <div class="ctrl"><div class="seg">${Object.entries(S).map(([k, v]) => `<button data-s="${k}">${v[0]}</button>`).join("")}</div></div>
+    <div class="term" data-term></div><div data-verdict></div>`;
+  function draw() {
+    $("[data-term]", el).innerHTML = `<span class="c"># result file:</span>\n"nvidia_smi": ${S[sc][1]}`;
+    $("[data-verdict]", el).innerHTML = sc === "ok" ? `<div class="verdict ok">Works. Now try the other three: can you tell them apart from the JSON?</div>`
+      : `<div class="verdict warn">Three different problems, three different fixes (install it / fix the driver / reboot the GPU), and the result file looks exactly the same for all of them.</div>`;
+    $$("[data-s]", el).forEach(b => b.classList.toggle("on", b.dataset.s === sc));
+  }
+  el.addEventListener("click", e => { if (e.target.dataset.s) { sc = e.target.dataset.s; draw(); } });
+  draw();
+};
+
+/* ---------------------------------------------------------------- solution demos */
+DEMOS.stream_sol = el => DEMOS.stream(el, { proposed: true });
+
+DEMOS.lifecycle = el => {
+  const S = [
+    ["main", "1. Snapshot (before)", "Device facts via NVML / nvidia-smi. torch facts that don't touch the device. No CUDA context in this process."],
+    ["main", "2. Start workers (spawn)", "spawn starts fresh interpreters instead of copying the main process, so nothing CUDA-related is inherited."],
+    ["worker", "3. Load model", "The worker initializes CUDA for itself here. Load time is recorded as its own metric (#4)."],
+    ["worker", "4. Warmup", "Not recorded. First calls pay one-off costs: kernel selection, memory pool growth, CUDA graph capture."],
+    ["worker", "5. Measured requests", "The only part whose tokens count toward throughput (#4)."],
+    ["main", "6. Snapshot (after)", "Same fields again. Did clocks, temperature or other processes on the GPU change during the run? (#6)"],
+    ["main", "7. Save result", "Raw records + both snapshots + a summary derived from them."],
+  ];
+  let i = 0;
+  el.innerHTML = `<div class="lbl">Proposed order of a benchmark run (click a step, or use Next)</div>
+    <div class="lanes" data-l></div><div class="log" data-log></div>
+    <div class="ctrl" style="margin:10px 0 0"><button class="b" data-back>← Back</button><button class="b primary" data-next>Next →</button></div>`;
+  function draw() {
+    const lane = name => S.map(([l, t], k) => `<button class="node ${l !== name ? "ghost" : ""} ${k === i ? "on" : ""} ${k < i && l === name ? "okn" : ""}" data-i="${k}">${t}</button>`).join("");
+    $("[data-l]", el).innerHTML = `<div class="lane"><span>Main process<br>(no CUDA)</span><div class="row row7">${lane("main")}</div></div><div class="lane"><span>Worker<br>(owns the GPU)</span><div class="row row7">${lane("worker")}</div></div>`;
+    $("[data-log]", el).textContent = S[i][2];
+  }
+  el.addEventListener("click", e => {
+    const n = e.target.closest("[data-i]");
+    if (n) i = +n.dataset.i;
+    else if (e.target.closest("[data-next]")) i = Math.min(S.length - 1, i + 1);
+    else if (e.target.closest("[data-back]")) i = Math.max(0, i - 1);
+    else return;
+    draw();
+  });
+  draw();
+};
+
+DEMOS.git_sol = el => {
+  const rows = [
+    ["Launched from the project repo", ["ok", "ok", "ok"]],
+    ["Launched from ~ (not a repo)", ["warn", "ok", "ok"]],
+    ["Launched from inside ForgeML", ["bad", "ok", "ok"]],
+    ["Project folder has no .git of its own, but sits inside another repo", ["bad", "bad", "ok"]],
+  ];
+  const cols = ["Current: current directory", "Anchored to __file__", "Anchored + top-level check"];
+  const why = {
+    "0,0": "Works only because you happened to launch from the right place.", "0,1": "Correct.", "0,2": "Correct.",
+    "1,0": "null: missing but honest.", "1,1": "Correct: the launch directory no longer matters.", "1,2": "Correct.",
+    "2,0": "Records ForgeML's commit. Looks valid, is wrong.", "2,1": "Correct: git runs in the project folder.", "2,2": "Correct.",
+    "3,0": "git walks up to the parent repo and records its commit. Wrong.", "3,1": "Still wrong! git also walks up from the project folder to the parent repo.", "3,2": "The top-level folder isn't the project root, so it records null + \"project is not its own git repo\". Honest.",
+  };
+  const label = { ok: "✓ correct", warn: "null", bad: "✗ wrong" };
+  let sel = "3,1";
+  el.innerHTML = `<div class="lbl">Which approach gives an honest answer in each situation? Click a cell.</div>
+    <div class="tblwrap"><table class="cmp matrix" data-m></table></div><div data-verdict></div>`;
+  function draw() {
+    $("[data-m]", el).innerHTML = `<tr><th>Situation</th>${cols.map(c => `<th>${c}</th>`).join("")}</tr>` +
+      rows.map(([r, cs], ri) => `<tr><td>${r}</td>${cs.map((c, ci) => `<td><span class="cell ${c} ${sel === ri + "," + ci ? "sel" : ""}" data-c="${ri},${ci}">${label[c]}</span></td>`).join("")}</tr>`).join("");
+    const [ri, ci] = sel.split(",").map(Number);
+    const c = rows[ri][1][ci];
+    $("[data-verdict]", el).innerHTML = `<div class="verdict ${c}">${why[sel]}</div>`;
+  }
+  el.addEventListener("click", e => { const c = e.target.closest("[data-c]"); if (c) { sel = c.dataset.c; draw(); } });
+  draw();
+};
+
+DEMOS.wall_sol = el => {
+  const reqs = [["w", 21.0, 23.5], ["w", 22.0, 24.6], ["m", 25.0, 41.0], ["m", 27.5, 46.5], ["m", 31.0, 50.0], ["m", 36.0, 52.5], ["m", 40.0, 55.0]];
+  let showW = false;
+  el.innerHTML = `<div class="lbl">Deriving the measured window from the request records (illustrative)</div>
+    <div class="ctrl"><label><input type="checkbox" data-w> Show warmup requests</label></div>
+    <svg viewBox="0 0 620 210" width="100%" height="210" data-svg></svg>
+    <p class="muted" style="font-size:13px;margin:6px 0 0">The window starts at the first <b>measured</b> submit and ends at the last <b>measured</b> token. Model load and warmup fall outside it automatically; nobody has to choose.</p>`;
+  function draw() {
+    const L = 20, R = 10, x = t => L + (t / 64) * (620 - L - R);
+    const vis = reqs.filter(r => showW || r[0] === "m");
+    const meas = reqs.filter(r => r[0] === "m");
+    const ws = Math.min(...meas.map(r => r[1])), we = Math.max(...meas.map(r => r[2]));
+    let y = 40;
+    const bars = vis.map(r => { const yy = y; y += 22; return `<rect x="${x(r[1])}" y="${yy}" width="${x(r[2]) - x(r[1])}" height="14" rx="4" fill="${r[0] === "m" ? "#86efac" : "#fde68a"}"/><text x="${x(r[2]) + 4}" y="${yy + 11}">${r[0] === "m" ? "measured" : "warmup"}</text>`; }).join("");
+    $("[data-svg]", el).innerHTML = `
+      <rect x="${x(0)}" y="12" width="${x(20) - x(0)}" height="16" rx="4" fill="#c7d2fe"/><text x="${x(10)}" y="24" text-anchor="middle" style="fill:#1e1b4b">model load</text>
+      <rect x="${x(ws)}" y="34" width="${x(we) - x(ws)}" height="${y - 30}" fill="var(--accent-soft)" stroke="var(--accent)" stroke-dasharray="4 3"/>
+      ${bars}
+      <text x="${x(ws)}" y="${y + 18}" text-anchor="middle" style="fill:var(--accent);font-weight:600">first measured submit</text>
+      <text x="${x(we)}" y="${y + 18}" text-anchor="end" style="fill:var(--accent);font-weight:600">last measured token</text>
+      ${[0, 10, 20, 30, 40, 50, 60].map(t => `<text x="${x(t)}" y="205" text-anchor="middle">${t}s</text>`).join("")}`;
+    $("[data-svg]", el).setAttribute("viewBox", `0 0 620 ${Math.max(210, y + 40)}`);
+  }
+  $("[data-w]", el).onchange = e => { showW = e.target.checked; draw(); };
+  draw();
+};
+
+DEMOS.eos_sol = el => {
+  const natural = [256, 64, 256, 180, 256, 96];
+  let force = false;
+  el.innerHTML = `<div class="lbl">Six requests, all asking for 256 tokens. Some models stop early.</div>
+    <div class="ctrl"><label><input type="checkbox" data-f> Force fixed length (ignore end-of-sequence)</label></div>
+    <div class="tblwrap"><table class="cmp" data-t></table></div><div data-verdict></div>`;
+  function draw() {
+    const rows = natural.map((n, i) => { const out = force ? 256 : n; return [i + 1, 256, out, out === 256 ? "length" : "stop"]; });
+    const bad = rows.filter(r => r[2] !== r[1]).length;
+    $("[data-t]", el).innerHTML = `<tr><th>Request</th><th>max_tokens</th><th>output_tokens</th><th>finish_reason</th></tr>` +
+      rows.map(r => `<tr><td>r${r[0]}</td><td>${r[1]}</td><td class="${r[2] !== r[1] ? "wrong" : "right"}">${r[2]}</td><td>${r[3]}</td></tr>`).join("");
+    $("[data-verdict]", el).innerHTML = bad
+      ? `<div class="verdict bad">Summary flags the run: ${bad} of 6 requests stopped early. Comparison tools refuse to plot it next to a fixed-length run.</div>`
+      : `<div class="verdict ok">All requests did the same work. Safe to compare. (The result records that fixed length was forced.)</div>`;
+  }
+  $("[data-f]", el).onchange = e => { force = e.target.checked; draw(); };
+  draw();
+};
+
+DEMOS.clock_sol = el => {
+  const o = { samp: true, snap: true, lock: false };
+  const clockAt = t => (o.lock ? 88 : t < 2 ? 100 : Math.max(78, 100 - (t - 2) * 4.5));
+  el.innerHTML = `<div class="lbl">What the proposed capture sees (illustrative curve, not real data)</div>
+    <div class="ctrl"><label><input type="checkbox" data-o="snap" checked> Before/after snapshots</label><label><input type="checkbox" data-o="samp" checked> Sampler every 0.5 min</label><label><input type="checkbox" data-o="lock"> Lock clocks</label></div>
+    <svg viewBox="0 0 600 170" width="100%" height="170" data-svg></svg><div data-verdict></div>`;
+  function draw() {
+    const W = 600, H = 170, L = 40, R = 10, T = 10, B = 26;
+    const x = t => L + (t / 10) * (W - L - R), y = c => T + ((100 - c) / 30) * (H - T - B);
+    let path = ""; for (let t = 0; t <= 10.001; t += 0.1) path += (path ? "L" : "M") + x(t).toFixed(1) + "," + y(clockAt(t)).toFixed(1);
+    let dots = ""; if (o.samp) for (let t = 0; t <= 10.001; t += 0.5) dots += `<circle cx="${x(t)}" cy="${y(clockAt(t))}" r="3.5" fill="var(--ok)"/>`;
+    const snaps = o.snap ? [0, 10].map(t => `<rect x="${x(t) - 6}" y="${y(clockAt(t)) - 6}" width="12" height="12" fill="none" stroke="var(--bad)" stroke-width="2.5"/>`).join("") : "";
+    $("[data-svg]", el).innerHTML = `<path d="${path}" fill="none" stroke="var(--accent)" stroke-width="2.5"/>${dots}${snaps}
+      ${[0, 2, 4, 6, 8, 10].map(t => `<text x="${x(t)}" y="${H - 8}" text-anchor="middle">${t} min</text>`).join("")}
+      ${[100, 90, 80].map(c => `<text x="${L - 6}" y="${y(c) + 4}" text-anchor="end">${c}%</text>`).join("")}`;
+    let v;
+    if (o.lock) v = ["ok", "Locked: the clock is flat and repeatable across runs, but lower than the GPU's best. Record that it was locked."];
+    else if (o.samp) v = ["ok", "The sampler shows the clock falling after ~2 minutes, so the summary can report min clock and throttled time."];
+    else if (o.snap) v = ["warn", "Before and after differ, so you know something changed, but not when or for how long."];
+    else v = ["bad", "No state captured: the slowdown is invisible."];
+    $("[data-verdict]", el).innerHTML = `<div class="verdict ${v[0]}">${v[1]}</div>`;
+  }
+  el.addEventListener("change", e => { const k = e.target.dataset.o; if (k) { o[k] = e.target.checked; draw(); } });
+  draw();
+};
+
+DEMOS.dirty_sol = el => {
+  const c = { mode: "report", tree: "dirty", allow: false };
+  el.innerHTML = `<div class="lbl">Pick a situation and follow the runner's decision</div>
+    <div class="ctrl"><div class="seg" data-g="mode"><button data-v="report">Report run</button><button data-v="dev">Dev run</button></div>
+    <div class="seg" data-g="tree"><button data-v="clean">Clean + committed</button><button data-v="dirty">Uncommitted changes</button><button data-v="none">No commits yet</button></div>
+    <label><input type="checkbox" data-allow> --allow-dirty</label></div>
+    <div class="flow" data-f></div><div data-verdict></div>`;
+  function draw() {
+    let out;
+    if (c.tree === "clean") out = ["ok", "Runs.", 'Records commit + dirty: false. Fully reproducible.'];
+    else if (c.mode === "report") out = ["bad", "Refuses.", c.tree === "none" ? "There's no commit to point to. Commit first." : "Report numbers must come from committed code. Commit, then rerun."];
+    else if (!c.allow) out = ["bad", "Refuses.", "Dev runs on a dirty tree need --allow-dirty, so it's always a deliberate choice."];
+    else out = ["warn", "Runs, labelled.", "Records mode: dev, dirty: true, the changed files and a hash of the diff. Analysis can filter these out."];
+    const node = (t, s, cls = "") => `<span class="node ${cls}" style="flex:0 1 auto;cursor:default">${t}<small>${s}</small></span>`;
+    $("[data-f]", el).innerHTML = node("Mode", c.mode) + '<span class="arr">→</span>' + node("Tree", { clean: "clean", dirty: "dirty", none: "no commits" }[c.tree]) + '<span class="arr">→</span>' + node("--allow-dirty", c.allow ? "yes" : "no", c.tree === "clean" || c.mode === "report" ? "" : "") + '<span class="arr">→</span>' + node(out[1], "", out[0] === "ok" ? "okn" : out[0] === "bad" ? "badn" : "warnn");
+    $("[data-verdict]", el).innerHTML = `<div class="verdict ${out[0]}">${out[2]}</div>`;
+    $$("[data-g]", el).forEach(g => $$("[data-v]", g).forEach(b => b.classList.toggle("on", b.dataset.v === c[g.dataset.g])));
+  }
+  el.addEventListener("click", e => { const b = e.target.closest("[data-v]"); if (b) { c[b.closest("[data-g]").dataset.g] = b.dataset.v; draw(); } });
+  $("[data-allow]", el).onchange = e => { c.allow = e.target.checked; draw(); };
+  draw();
+};
+
+DEMOS.layers = el => {
+  const L = [
+    ["Hardware", "GPU model, memory, instance type", "NVML / nvidia-smi + cloud instance type", "partly (GPU name, memory)"],
+    ["Driver", "NVIDIA driver version", "NVML / nvidia-smi", "yes"],
+    ["CUDA toolkit", "nvcc version (compiles your kernels)", "nvcc --version", "no"],
+    ["CUDA libraries", "cuBLAS, cuDNN, NCCL…", "torch.version.cuda + installed nvidia-* packages", "partly (cuDNN)"],
+    ["Python packages", "Everything in the environment", "Hash of uv.lock + full list of installed packages", "8 hand-picked"],
+    ["Project code", "Your code", "git commit + dirty flag + diff hash", "commit + dirty (broken: #3, #7)"],
+  ];
+  let i = 4;
+  el.innerHTML = `<div class="lbl">The software stack under a benchmark, bottom to top. Click a layer.</div><div class="stack" data-s></div><div data-d></div>`;
+  function draw() {
+    $("[data-s]", el).innerHTML = L.map((l, k) => `<button class="node layer ${k === i ? "on" : ""}" data-i="${k}"><span><b>${l[0]}</b><small>${l[1]}</small></span><span class="pill">${l[3] === "yes" ? "✓ recorded" : l[3] === "no" ? "✗ not recorded" : "~ " + l[3]}</span></button>`).join("");
+    $("[data-d]", el).innerHTML = `<div class="verdict ok">Proposed source of truth for <b>${L[i][0]}</b>: ${L[i][2]}</div>`;
+  }
+  el.addEventListener("click", e => { const n = e.target.closest("[data-i]"); if (n) { i = +n.dataset.i; draw(); } });
+  draw();
+};
+
+DEMOS.cwd_sol = el => {
+  let inst = true;
+  el.innerHTML = `<div class="lbl">Same three situations, before and after installing the project</div>
+    <div class="ctrl"><div class="seg"><button data-i="0">Not installed (now)</button><button data-i="1">Installed (proposed)</button></div></div>
+    <div class="term" data-term></div>`;
+  function draw() {
+    const ok = '<span class="g">✓ works</span>', bad = '<span class="r">✗ ModuleNotFoundError</span>';
+    $("[data-term]", el).innerHTML = `<span class="c"># from the repo root</span>\n<span class="c">$</span> uv run ${inst ? "benchmark env" : "python -m benchmarks.env"}      ${ok}\n<span class="c"># from ~</span>\n<span class="c">$</span> uv run --project ~/…/llm-inference-performance ${inst ? "benchmark env" : "python -m benchmarks.env"}   ${inst ? ok : bad}\n<span class="c"># GPU VM session script over SSH</span>\n<span class="c">$</span> ./run_session.sh   ${inst ? ok : bad}`;
+    $$("[data-i]", el).forEach(b => b.classList.toggle("on", +b.dataset.i === (inst ? 1 : 0)));
+  }
+  el.addEventListener("click", e => { const b = e.target.closest("[data-i]"); if (b) { inst = b.dataset.i === "1"; draw(); } });
+  draw();
+};
+
+DEMOS.clocks_sol = el => {
+  let prop = true;
+  el.innerHTML = `<div class="lbl">Which readings get subtracted from which?</div>
+    <div class="ctrl"><div class="seg"><button data-p="0">Naive</button><button data-p="1">Proposed</button></div></div>
+    <div class="lanes" data-l></div><div data-verdict></div>`;
+  function draw() {
+    const n = (t, s, cls) => `<span class="node ${cls}" style="cursor:default">${t}<small>${s}</small></span>`;
+    const c = prop ? "okn" : "", sv = prop ? "warnn" : "badn";
+    $("[data-l]", el).innerHTML = `
+      <div class="lane"><span>Client (Mac)<br>client clock</span><div class="row">${n("submit", "client t=12.000", prop ? "okn" : "badn")}${n("first token arrives", "client t=12.250", c)}${n("last token arrives", "client t=17.300", c)}</div></div>
+      <div class="lane"><span>Server (GPU VM)<br>server clock</span><div class="row">${n("request queued", "server t=503.010", sv)}${n("prefill starts", "server t=503.090", sv)}${n("first token produced", "server t=503.240", prop ? "warnn" : "badn")}</div></div>`;
+    $("[data-verdict]", el).innerHTML = prop
+      ? `<div class="verdict ok">TTFT = 12.250 − 12.000 = 0.250 s, both readings from the client clock. The server reports queue time as a <i>duration</i> (0.080 s), computed on its own clock and never subtracted from client readings.</div>`
+      : `<div class="verdict bad">"TTFT" = server first token − client submit = 503.240 − 12.000 = 491.24 s. Readings from two unrelated clocks.</div>`;
+    $$("[data-p]", el).forEach(b => b.classList.toggle("on", (b.dataset.p === "1") === prop));
+  }
+  el.addEventListener("click", e => { const b = e.target.closest("[data-p]"); if (b) { prop = b.dataset.p === "1"; draw(); } });
+  draw();
+};
+
+DEMOS.power_sol = el => {
+  const c = { ac: true, low: false, hot: false };
+  el.innerHTML = `<div class="lbl">Same toggles as before, now with the proposed capture</div>
+    <div class="ctrl"><label><input type="checkbox" data-c="ac" checked> On the charger</label><label><input type="checkbox" data-c="low"> Low Power Mode</label><label><input type="checkbox" data-c="hot"> Warm after heavy load</label></div>
+    <div class="term" data-term></div>`;
+  function draw() {
+    const warn = [];
+    if (!c.ac) warn.push("running on battery");
+    if (c.low) warn.push("Low Power Mode is on");
+    if (c.hot) warn.push("thermal pressure reported");
+    $("[data-term]", el).innerHTML = `<span class="c"># result file</span>\n"power": { "source": "${c.ac ? "ac" : "battery"}", "low_power_mode": ${c.low}, "thermal_pressure": "${c.hot ? "elevated" : "nominal"}" }\n${warn.length ? `<span class="y">⚠ warning: ${warn.join(", ")}. Results may not be repeatable.</span>` : '<span class="g">✓ conditions OK</span>'}`;
+  }
+  el.addEventListener("change", e => { const k = e.target.dataset.c; if (k) { c[k] = e.target.checked; draw(); } });
+  draw();
+};
+
+DEMOS.run_sol = el => {
+  let sc = "missing";
+  const S = {
+    ok: ["works", '"nvidia_smi": { "status": "ok", "value": [{ "name": "NVIDIA L4", … }] }'],
+    na: ["Mac (no GPU)", '"nvidia_smi": { "status": "not_applicable", "value": null }'],
+    missing: ["not installed", '"nvidia_smi": { "status": "not_found", "value": null }'],
+    crash: ["driver broken", '"nvidia_smi": { "status": "failed", "value": null, "exit_code": 9, "stderr": "NVIDIA-SMI has failed because it couldn\'t communicate with the NVIDIA driver…" }'],
+    hang: ["GPU hung", '"nvidia_smi": { "status": "timeout", "value": null, "timeout_s": 10 }'],
+  };
+  el.innerHTML = `<div class="lbl">Same situations, with the proposed status field</div>
+    <div class="ctrl"><div class="seg">${Object.entries(S).map(([k, v]) => `<button data-s="${k}">${v[0]}</button>`).join("")}</div></div>
+    <div class="term" data-term></div><div class="verdict ok" style="margin-top:10px">Every case is now distinguishable from the JSON alone.</div>`;
+  function draw() {
+    $("[data-term]", el).textContent = S[sc][1];
+    $$("[data-s]", el).forEach(b => b.classList.toggle("on", b.dataset.s === sc));
+  }
+  el.addEventListener("click", e => { const b = e.target.closest("[data-s]"); if (b) { sc = b.dataset.s; draw(); } });
+  draw();
+};
+
+DEMOS.tests_sol = el => {
+  const T = [
+    ["Run from another directory", "#3 #9", "Start the snapshot with the working directory set to a temp folder.", "The commit equals the project's commit, not null."],
+    ["Repo with no commits", "#3 #7", "git init in tmp_path, no commit.", "commit is null and the reason says 'no commits'."],
+    ["Dirty tree", "#7", "Commit a file, then modify it.", "dirty is true; the changed file is listed; the diff hash is present."],
+    ["Project nested in another repo", "#3", "Create an outer repo in tmp_path with the project folder inside it, no .git of its own.", "commit is null with reason 'not its own repo', not the outer repo's hash."],
+    ["nvidia-smi missing", "#13", "Replace the command helper with a fake that reports 'not found'.", "status is not_found (or not_applicable on macOS)."],
+    ["nvidia-smi times out", "#13", "Fake helper that reports a timeout.", "status is timeout; nothing crashes."],
+    ["Non-streaming request", "#1", "A record with one event carrying 256 tokens.", "output_tokens = 256; TTFT is unknown and excluded from the distribution, with the exclusion counted."],
+    ["Early stop", "#5", "A record with max_tokens 256, output 64, finish_reason stop.", "The summary flags one length mismatch."],
+    ["Summary is recomputable", "#4", "Save a result, delete its summary, load it.", "The recomputed summary equals the original."],
+    ["No hostname", "#11", "Capture a snapshot.", "No field contains the machine's hostname."],
+  ];
+  let i = 0;
+  el.innerHTML = `<div class="lbl">Proposed test cases. Click one to see setup and assertion.</div><div class="chips" data-c></div><div data-d></div>`;
+  function draw() {
+    $("[data-c]", el).innerHTML = T.map((t, k) => `<button class="chip ${k === i ? "guess-y" : ""}" data-i="${k}">${t[0]}<small>${t[1]}</small></button>`).join("");
+    $("[data-d]", el).innerHTML = `<div class="tblwrap"><table class="cmp"><tr><th>Setup</th><td>${T[i][2]}</td></tr><tr><th>Assert</th><td>${T[i][3]}</td></tr></table></div>`;
+  }
+  el.addEventListener("click", e => { const n = e.target.closest("[data-i]"); if (n) { i = +n.dataset.i; draw(); } });
+  draw();
+};
+
+/* ---------------------------------------------------------------- events */
+document.addEventListener("click", e => {
+  const go = e.target.closest("[data-go]");
+  if (go && !go.disabled) { st.cur = +go.dataset.go; save(); render(); window.scrollTo({ top: $(".layout").offsetTop - 8, behavior: "smooth" }); return; }
+  const pr = e.target.closest("[data-pr]");
+  if (pr) { st.filter = st.filter === pr.dataset.pr ? null : pr.dataset.pr; save(); renderTop(); renderNav(); return; }
+  const sb = e.target.closest("[data-sol]");
+  if (sb) { const n = +sb.dataset.sol; st.sol[n] = !st.sol[n]; save(); renderMain(); if (st.sol[n]) $(".sol").scrollIntoView({ behavior: "smooth", block: "start" }); return; }
+  const got = e.target.closest("[data-got]");
+  if (got) { const n = +got.dataset.got; st.got[n] = !st.got[n]; save(); render(); return; }
+  const q = e.target.closest(".quiz [data-q]");
+  if (q) { st.quiz[st.cur] = +q.dataset.q; save(); renderMain(); return; }
+  if (e.target.closest("[data-copy]")) {
+    const qs = $$(".qa label").map(l => l.textContent);
+    const txt = qs.map((q, i) => `${q}\n${st.answers[i] || "(no answer)"}`).join("\n\n");
+    (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(
+      () => { e.target.textContent = "Copied ✓"; },
+      () => { e.target.textContent = "Copy failed: select the text manually"; });
+  }
+});
+document.addEventListener("input", e => {
+  if (e.target.dataset.ans != null) { st.answers[e.target.dataset.ans] = e.target.value; save(); }
+});
+
+render();
+</script>
+</body>
+</html>

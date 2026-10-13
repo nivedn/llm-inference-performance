@@ -1,0 +1,788 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inference Lab Schedule</title>
+<style>
+:root {
+  --bg: #f6f7fb; --panel: #ffffff; --ink: #0f172a; --muted: #64748b; --line: #e2e8f0;
+  --accent: #1e40af; --accent-soft: #dbeafe; --ok: #047857; --ok-soft: #d1fae5;
+  --warn: #b45309; --warn-soft: #fef3c7; --bad: #b91c1c; --bad-soft: #fee2e2;
+  --hol: #fdf2d0; --chip: #f1f5f9; --today: #2563eb; --shadow: 0 1px 2px rgb(15 23 42 / .06), 0 1px 8px rgb(15 23 42 / .04);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0b1020; --panel: #121a2b; --ink: #e5e7eb; --muted: #94a3b8; --line: #23304a;
+    --accent: #93c5fd; --accent-soft: #1e3a8a55; --ok: #34d399; --ok-soft: #064e3b88;
+    --warn: #fbbf24; --warn-soft: #78350f66; --bad: #f87171; --bad-soft: #7f1d1d66;
+    --hol: #3a2f0f; --chip: #1c2740; --today: #60a5fa; --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0b1020; --panel: #121a2b; --ink: #e5e7eb; --muted: #94a3b8; --line: #23304a;
+  --accent: #93c5fd; --accent-soft: #1e3a8a55; --ok: #34d399; --ok-soft: #064e3b88;
+  --warn: #fbbf24; --warn-soft: #78350f66; --bad: #f87171; --bad-soft: #7f1d1d66;
+  --hol: #3a2f0f; --chip: #1c2740; --today: #60a5fa; --shadow: none;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif; }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 20px 16px 60px; }
+h1 { font-size: 22px; margin: 0; letter-spacing: -.01em; }
+.sub { color: var(--muted); margin: 2px 0 16px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 14px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; box-shadow: var(--shadow); }
+.card .k { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.card .v { font-size: 20px; font-weight: 650; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.card .s { font-size: 12px; color: var(--muted); }
+.bar { height: 6px; background: var(--chip); border-radius: 99px; overflow: hidden; margin-top: 8px; }
+.bar > i { display: block; height: 100%; background: var(--ok); border-radius: 99px; }
+.banner { border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; border: 1px solid; }
+.banner.ok { background: var(--ok-soft); border-color: transparent; color: var(--ok); }
+.banner.bad { background: var(--bad-soft); border-color: transparent; color: var(--bad); }
+.banner.warn { background: var(--warn-soft); border-color: transparent; color: var(--warn); }
+.banner b { color: inherit; }
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-bottom: 14px; overflow-x: auto; }
+.tabs button { background: none; border: 0; padding: 9px 12px; font: inherit; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; }
+.tabs button.on { color: var(--ink); border-color: var(--accent); font-weight: 600; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); }
+.pad { padding: 14px; }
+.muted { color: var(--muted); }
+.pill { display: inline-block; font-size: 11px; font-weight: 600; padding: 1px 8px; border-radius: 99px; background: var(--chip); color: var(--muted); white-space: nowrap; }
+.pill.ok { background: var(--ok-soft); color: var(--ok); }
+.pill.bad { background: var(--bad-soft); color: var(--bad); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+.pill.gpu { background: #ede9fe; color: #6d28d9; }
+.pill.mac { background: var(--chip); color: var(--muted); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .pill.gpu { background: #4c1d9566; color: #c4b5fd; } }
+:root[data-theme="dark"] .pill.gpu { background: #4c1d9566; color: #c4b5fd; }
+input[type="number"], input[type="date"] { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 3px 6px; }
+input[type="number"] { width: 64px; }
+input[type="checkbox"] { width: 17px; height: 17px; accent-color: var(--ok); cursor: pointer; flex: none; }
+button.b { font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
+button.b:hover { border-color: var(--accent); }
+button.b.danger { color: var(--bad); }
+button.link { background: none; border: 0; padding: 0; color: var(--muted); font: inherit; font-size: 12px; cursor: pointer; text-decoration: underline; }
+
+/* Tasks */
+.phase { margin-bottom: 14px; overflow: hidden; }
+.phase-h { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+.phase-h .name { font-weight: 650; display: flex; align-items: center; gap: 8px; }
+.dot { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.phase-h .meta { font-size: 12px; color: var(--muted); display: flex; gap: 12px; flex-wrap: wrap; margin-left: auto; align-items: center; }
+.task { display: grid; grid-template-columns: 22px 1fr auto; gap: 4px 10px; padding: 10px 14px; border-bottom: 1px solid var(--line); align-items: start; }
+.task:last-child { border-bottom: 0; }
+.task.done .title { text-decoration: line-through; color: var(--muted); }
+.task.cut { opacity: .5; }
+.task .title { font-weight: 550; }
+.task .id { color: var(--muted); font-variant-numeric: tabular-nums; margin-right: 6px; font-weight: 500; }
+.kid { font-size: 13px; margin-top: 3px; }
+.task .crit { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+.task .side { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; font-size: 12px; color: var(--muted); text-align: right; }
+.task .nums { display: flex; gap: 8px; align-items: center; }
+.task .nums label { display: flex; gap: 4px; align-items: center; }
+
+/* Day by day */
+.week { margin-bottom: 12px; overflow: hidden; }
+.week-h { padding: 9px 14px; font-weight: 600; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.day { display: grid; grid-template-columns: 112px 1fr; gap: 10px; padding: 8px 14px; border-bottom: 1px solid var(--line); }
+.day:last-child { border-bottom: 0; }
+.day.hol { background: var(--hol); }
+.day.past { opacity: .72; }
+.day.today { box-shadow: inset 3px 0 0 var(--today); background: var(--accent-soft); }
+.day .d { font-weight: 600; font-variant-numeric: tabular-nums; }
+.day .d small { display: block; font-weight: 400; color: var(--muted); }
+.chunk { display: flex; gap: 8px; align-items: flex-start; padding: 2px 0; }
+.chunk .h { margin-left: auto; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; padding-left: 8px; }
+.flag { display: inline-block; font-size: 12px; font-weight: 600; color: var(--bad); margin: 2px 0; }
+.flag.met { color: var(--ok); }
+
+/* Timeline */
+.tl { padding: 14px; }
+.tl-row { display: grid; grid-template-columns: 230px 1fr; gap: 10px; align-items: center; margin: 6px 0; }
+.tl-label { font-size: 12.5px; display: flex; align-items: center; gap: 6px; min-width: 0; }
+.tl-label .pill { flex: none; }
+.tl-label span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.track { position: relative; height: 26px; background: var(--chip); border-radius: 6px; overflow: hidden; }
+.track .hol { position: absolute; top: 0; bottom: 0; background: repeating-linear-gradient(45deg, var(--hol), var(--hol) 4px, transparent 4px, transparent 8px); }
+.track .base { position: absolute; top: 4px; bottom: 4px; border: 1.5px dashed var(--muted); border-radius: 5px; opacity: .7; }
+.track .proj { position: absolute; top: 7px; bottom: 7px; border-radius: 4px; }
+.track .dl { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--bad); }
+.track .now { position: absolute; top: -2px; bottom: -2px; width: 2px; background: var(--today); z-index: 2; }
+.axis { position: relative; height: 18px; font-size: 11px; color: var(--muted); }
+.axis span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+.legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin-top: 10px; }
+.legend i { display: inline-block; width: 18px; height: 10px; border-radius: 3px; vertical-align: -1px; margin-right: 5px; }
+
+/* Settings */
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+.field { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px dashed var(--line); }
+.field:last-child { border-bottom: 0; }
+.wd { display: flex; gap: 6px; flex-wrap: wrap; }
+.wd label { display: flex; gap: 4px; align-items: center; font-size: 12.5px; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+.tag { background: var(--chip); border-radius: 99px; padding: 2px 4px 2px 10px; font-size: 12.5px; display: inline-flex; align-items: center; gap: 4px; }
+.tag button { border: 0; background: none; color: var(--muted); cursor: pointer; font-size: 14px; line-height: 1; padding: 0 4px; }
+h3 { font-size: 14px; margin: 0 0 6px; }
+.toast { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 8px 14px; border-radius: 8px; font-size: 13px; opacity: 0; transition: opacity .2s; pointer-events: none; }
+.toast.on { opacity: 1; }
+.empty { padding: 18px 14px; color: var(--muted); }
+
+@media (max-width: 640px) {
+  .tl-row { grid-template-columns: 1fr; gap: 3px; }
+  .day { grid-template-columns: 1fr; gap: 4px; }
+  .task { grid-template-columns: 22px 1fr; }
+  .task .side { grid-column: 2; align-items: flex-start; text-align: left; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>LLM Inference Performance Lab: Schedule</h1>
+  <p class="sub" id="sub"></p>
+  <div class="cards" id="cards"></div>
+  <div id="banner"></div>
+  <nav class="tabs" id="tabs"></nav>
+  <main id="view"></main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ======================================================================
+   PLAN DATA. Edit estimates here, or in the Tasks tab (saved per browser).
+   h = estimated hours. where = mac | gpu. opt = optional (safe to cut).
+   t = task · c = done when (technical check) · o = outcome in plain words.
+   Phase with after: true (Project 2) runs after the lab and does not count
+   toward the lab's hard deadline, progress or required pace.
+   ====================================================================== */
+const PHASES = [
+  { id: "P0", name: "Phase 0 · Benchmark infrastructure", where: "Mac", color: "#6366f1" },
+  { id: "P1", name: "Phase 1 · KV-cache simulator", where: "Mac", color: "#0ea5e9" },
+  { id: "P1b", name: "Phase 1b · Scheduling simulator", where: "Mac", color: "#14b8a6" },
+  { id: "P2", name: "Phase 2 · GPU baseline", where: "GPU", color: "#22c55e" },
+  { id: "P3", name: "Phase 3 · CUDA / Triton kernels", where: "GPU", color: "#eab308" },
+  { id: "P4", name: "Phase 4 · Runtimes and LLM optimizations", where: "GPU", color: "#f97316" },
+  { id: "P5", name: "Phase 5 · Serving and operations", where: "Mac → GPU", color: "#ec4899" },
+  { id: "P6", name: "Phase 6 · Report and portfolio", where: "Mac", color: "#8b5cf6" },
+  { id: "P7", name: "Project 2 · Distributed inference (after the lab)", where: "Mac → GPU", color: "#64748b", after: true },
+];
+
+const TASKS = [
+  // Phase 0
+  { id: "0.1", p: "P0", h: 2, where: "mac", t: "Assignment 0: review env.py, stats.py, schema.py", c: "Written findings list (problem, why it matters, fix), reviewed with Claude", o: "You find the mistakes in the code you already wrote and put them on a list." },
+  { id: "0.2", p: "P0", h: 3, where: "mac", t: "Fix Assignment 0 findings", c: "Fixes and new tests merged; pytest + ruff pass", o: "Every mistake on the list is fixed and all the tests turn green." },
+  { id: "0.3", p: "P0", h: 3, where: "mac", t: "Design runtime interface; answer concurrency, arrival and warmup questions", c: "Design notes agreed with Claude; decisions logged in project guide §11", o: "You decide how your measuring tool will talk to any AI engine, and write the choice down." },
+  { id: "0.4", p: "P0", h: 3, where: "mac", t: "Mock runtime with configurable prefill/decode timing", c: "Streams tokens with known timings; unit tested", o: "You have a pretend AI that talks at a speed you choose, so you can test your stopwatch." },
+  { id: "0.5", p: "P0", h: 5, where: "mac", t: "Benchmark runner: warmup, concurrency, per-request errors", c: "Produces RunResult; a failed request doesn't stop the run", o: "You can send lots of questions at once and save every answer's timing to a file, even if one question breaks." },
+  { id: "0.6", p: "P0", h: 2, where: "mac", t: "CLI entry point (benchmark --runtime ... --concurrency ...)", c: "One command → saved result JSON + printed summary", o: "One short command runs a test and shows you the results." },
+  { id: "0.7", p: "P0", h: 4, where: "mac", t: "E0: harness accuracy and concurrency tests", c: "Measured TTFT/ITL match the mock within a justified tolerance; concurrency proven by test", o: "Your stopwatch is proven right: the pretend AI's known speed matches what you measure." },
+  { id: "0.8", p: "P0", h: 3, where: "mac", t: "Workloads: fixed and distributed lengths, seeded", c: "Same seed → identical request list", o: "You can make exactly the same list of test questions again, any time." },
+  { id: "0.9", p: "P0", h: 4, where: "mac", t: "Analysis + automatic plots", c: "throughput vs P99, TTFT, ITL plots generated from result files", o: "Speed charts draw themselves from your result files." },
+  { id: "0.10", p: "P0", h: 3, where: "mac", t: "E1 on M5: predict, then measure, the decode bandwidth limit (small model on MPS)", c: "Prediction vs measurement written down (learning only, not for the report)", o: "You guess how fast your Mac can make words, then check whether your guess was right." },
+  { id: "0.12", p: "P0", h: 1.5, where: "mac", t: "Roadmap reading: compare your metrics with vllm bench and GuideLLM definitions", c: "Table: each of your metrics vs theirs; naming or formula differences fixed in benchmark-methodology.md", o: "Your speed words (like TTFT) mean exactly what the big tools mean by them." },
+  { id: "0.11", p: "P0", h: 1, where: "mac", t: "Update project guide + methodology; first commits", c: "Guide statuses and decisions current", o: "The project notebook says what's finished and what you decided." },
+  { id: "0.B", p: "P0", h: 1, where: "mac", t: "Buffer: Phase 0", c: "Slack for overruns. Mark done if unused", o: "Spare time in case something takes longer. If you don't need it, tick it off." },
+  // Phase 1
+  { id: "1.0", p: "P1", h: 1.5, where: "mac", t: "Roadmap reading: KV-cache part of Gordić's 'Inside vLLM'", c: "Notes: block table, free-block queue, reference counts, eviction", o: "You can explain how vLLM keeps the AI's memory in small boxes." },
+  { id: "1.1", p: "P1", h: 3, where: "mac", t: "Read the PagedAttention paper; map it to your memory-planner work", c: "One page of notes: what's the same as static planning and what's different", o: "You can say how vLLM's memory trick is like, and unlike, the memory planning you already know." },
+  { id: "1.2", p: "P1", h: 2, where: "mac", t: "Design the simulator: model shape, request trace, policies, metrics", c: "Interface sketch reviewed", o: "You draw a plan of your memory game before you build it." },
+  { id: "1.3", p: "P1", h: 3, where: "mac", t: "Contiguous allocator (reserve max length up front)", c: "Tested allocate/free; tracks wasted bytes", o: "You build the old way: every question gets one big memory box, even if it only uses a little." },
+  { id: "1.4", p: "P1", h: 4, where: "mac", t: "Paged allocator: block tables + free list", c: "Tested; handles growth one token at a time", o: "You build the new way: memory comes in small boxes, and a question gets one more box only when it needs it." },
+  { id: "1.5", p: "P1", h: 3, where: "mac", t: "Metrics: utilization timeline, internal/external fragmentation, max concurrency", c: "Metrics verified on hand-computed tiny cases", o: "You can count how much memory is wasted and how many questions fit at once." },
+  { id: "1.6", p: "P1", h: 3, where: "mac", t: "E2: sweep block size and length spread; plots", c: "Plots + prediction written before each sweep", o: "Charts show how box size changes the waste. You guessed first, then checked." },
+  { id: "1.8", p: "P1", h: 4, where: "mac", t: "Prefix sharing: share KV blocks across identical prompt prefixes (radix tree + ref counts)", c: "Shared-prefix workload: memory saved and extra concurrency vs no sharing; matches a hand-computed case", o: "When two questions start with the same words, they share the same memory boxes, and you show how much memory that saves.", opt: true },
+  { id: "1.7", p: "P1", h: 2, where: "mac", t: "Write docs/kv-cache.md", c: "Explains why paged KV exists, with your plots", o: "A page that uses your charts to explain why small memory boxes are better." },
+  { id: "1.B", p: "P1", h: 1, where: "mac", t: "Buffer: Phase 1", c: "Slack for overruns", o: "Spare time in case something takes longer. If you don't need it, tick it off." },
+  // Phase 1b
+  { id: "1b.1", p: "P1b", h: 2, where: "mac", t: "Read Orca (continuous batching) + Sarathi (chunked prefill)", c: "Notes: what each scheduler optimizes", o: "You can explain two ways a busy AI serves many people at once." },
+  { id: "1b.2", p: "P1b", h: 2, where: "mac", t: "Cost model for prefill and decode steps", c: "Step time as a function of batch and tokens, justified", o: "You write a simple rule for how long each step of the AI takes." },
+  { id: "1b.3", p: "P1b", h: 5, where: "mac", t: "Policies: none / static / continuous batching", c: "Emits standard RequestRecords", o: "Your pretend AI can serve people one at a time, in fixed groups, or let new people join at any moment." },
+  { id: "1b.4", p: "P1b", h: 3, where: "mac", t: "E3 (sim): concurrency 1→32 latency/throughput curves", c: "Plots via the same analysis pipeline", o: "Charts show that bigger groups serve more people, but each person waits a bit longer." },
+  { id: "1b.6", p: "P1b", h: 3, where: "mac", t: "Chunked-prefill policy: split long prompts into chunks mixed with decode steps", c: "ITL P99 with vs without chunking under mixed long/short prompts; chunk size swept", o: "A long question no longer makes everyone else's answers freeze, and a chart proves it.", opt: true },
+  { id: "1b.5", p: "P1b", h: 2, where: "mac", t: "Draft docs/batching.md", c: "Trade-off explained, ITL P99 under mixed prefill", o: "A page explaining the trade-off, including why long questions make answers stutter." },
+  { id: "1b.B", p: "P1b", h: 1, where: "mac", t: "Buffer: Phase 1b", c: "Slack for overruns", o: "Spare time in case something takes longer. If you don't need it, tick it off." },
+  // Phase 2
+  { id: "2.0", p: "P2", h: 3, where: "mac", t: "Roadmap reading: Horace He 'Go Brrrr', kipply 'Transformer Inference Arithmetic', Modal GPU Glossary", c: "Can derive decode tok/s upper bound and KV bytes/token for your model on paper", o: "You can work out on paper how fast a GPU can talk, before you rent one." },
+  { id: "2.1", p: "P2", h: 3, where: "mac", t: "GPU architecture + roofline: compute the ridge point for L4 and A10G", c: "Peak FLOP/s, bandwidth and ridge point written down with sources", o: "You know the two speed limits of the L4 and A10G: how fast they do math and how fast they fetch data." },
+  { id: "2.2", p: "P2", h: 5, where: "mac", t: "Cloud setup + GPU session script (provision → setup → run → pull → shut down)", c: "One script runs a session end to end", o: "One script rents the GPU, runs your tests, brings the results home and switches the GPU off, so you don't pay extra." },
+  { id: "2.3", p: "P2", h: 2, where: "gpu", t: "First session: driver/CUDA check; check nsys + ncu counters work", c: "ncu reports counters on a trivial kernel (else switch provider)", o: "You check that the GPU's x-ray tools work before doing anything else." },
+  { id: "2.4", p: "P2", h: 4, where: "gpu", t: "Choose model; HF PyTorch runtime adapter with streaming", c: "Runs through the harness on NVIDIA", o: "The plain PyTorch AI runs on the real GPU through your measuring tool." },
+  { id: "2.5", p: "P2", h: 3, where: "gpu", t: "GPU sampler (NVML) → device_samples", c: "Utilization/memory/clock samples in result files", o: "Your results also record how busy and how full the GPU was." },
+  { id: "2.6", p: "P2", h: 4, where: "gpu", t: "Baseline runs + repeats to measure noise", c: "Reproducible baseline with a stated noise band", o: "You run the same test many times and know how much the numbers wobble." },
+  { id: "2.7", p: "P2", h: 3, where: "gpu", t: "E4/E5: separate prefill vs decode time", c: "TTFT vs prompt length, ITL vs output length plots", o: "You show how long reading the question takes compared with writing each word of the answer." },
+  { id: "2.8", p: "P2", h: 4, where: "gpu", t: "Nsight Systems timeline of the baseline", c: "Launch gaps, syncs and idle time identified", o: "An x-ray timeline shows when the GPU was working and when it sat idle." },
+  { id: "2.10", p: "P2", h: 2, where: "mac", t: "Cost model: ₹/$ per 1M tokens for the baseline on L4 vs A10G", c: "Cost table computed from result files and cited hourly prices", o: "You know how much it costs for the AI to write one million words." },
+  { id: "2.9", p: "P2", h: 3, where: "mac", t: "Profiling write-up #1 (docs/profiling/01-baseline.md)", c: "Problem → evidence → hypothesis → next step", o: "A page saying what was slow, how you know, and what you'll try next." },
+  { id: "2.B", p: "P2", h: 3, where: "mac", t: "Buffer: Phase 2 (setup always takes longer)", c: "Slack for overruns", o: "Spare time in case something takes longer. If you don't need it, tick it off." },
+  // Phase 3
+  { id: "3.0", p: "P3", h: 3, where: "mac", t: "Roadmap reading: GPU MODE lectures 1–3 (profiling, CUDA basics, PMPP chapters)", c: "Notes; followed along with the lecture examples", o: "You've watched experts show how to write and check GPU programs." },
+  { id: "3.1", p: "P3", h: 5, where: "mac", t: "CUDA fundamentals: grids/blocks/warps, memory hierarchy, coalescing, occupancy", c: "Can explain each with a diagram", o: "You can draw and explain how a GPU splits work across thousands of tiny workers." },
+  { id: "3.2", p: "P3", h: 5, where: "gpu", t: "Kernel 1: vector add (naive → coalesced → vectorized loads)", c: "ncu bandwidth vs peak; short write-up", o: "Your first GPU program adds two long lists super fast, and you know how close to top speed it got." },
+  { id: "3.3", p: "P3", h: 7, where: "gpu", t: "Kernel 2: reduction (naive → shared memory → warp shuffle)", c: "Stall reasons explained; write-up", o: "Your GPU program adds up a huge list into one number, faster with each version." },
+  { id: "3.4", p: "P3", h: 12, where: "gpu", t: "Kernel 3: tiled GEMM (naive → shared tiles → register tiles) vs cuBLAS", c: "Roofline position per version; write-up", o: "Your matrix multiply gets faster step by step, and you compare it with NVIDIA's own." },
+  { id: "3.5", p: "P3", h: 1, where: "mac", t: "Choose the fused-kernel target from the baseline profile", c: "Choice justified by profile evidence", o: "You pick which slow part to speed up based on the x-ray, not a guess." },
+  { id: "3.11", p: "P3", h: 2, where: "mac", t: "Roadmap reading: FlashAttention 1 and 2 papers (skim 3)", c: "Notes: why fusing attention cuts memory traffic; linked to your fused-kernel bytes-moved analysis", o: "You can explain why doing attention in one pass, without writing big tables to memory, is faster." },
+  { id: "3.6", p: "P3", h: 8, where: "gpu", t: "Kernel 4: fused inference kernel in CUDA (e.g. RMSNorm / SiLU·mul)", c: "Correct against PyTorch; bytes moved vs unfused", o: "You join several small steps into one GPU program so it moves less data." },
+  { id: "3.7", p: "P3", h: 3, where: "mac", t: "Triton tutorials: programming model, autotuning", c: "Tutorial kernels run", o: "You've tried Triton, an easier way to write GPU programs." },
+  { id: "3.8", p: "P3", h: 6, where: "gpu", t: "Triton version of the fused kernel; PyTorch vs CUDA vs Triton", c: "Latency + bandwidth comparison; when to choose Triton", o: "The same program written three ways, and you show which is fastest and when to pick Triton." },
+  { id: "3.9", p: "P3", h: 4, where: "gpu", t: "Plug the fused kernel into the model; measure end-to-end effect", c: "Honest end-to-end delta (even if small) explained", o: "You put your fast program into the real AI and measure honestly how much it helped." },
+  { id: "3.10", p: "P3", h: 3, where: "mac", t: "Write docs/gpu-performance.md", c: "Kernel ladder story with profiles", o: "A page telling the story of each program getting faster, with x-ray proof." },
+  { id: "3.B", p: "P3", h: 4, where: "mac", t: "Buffer: Phase 3", c: "Slack for overruns", o: "Spare time in case something takes longer. If you don't need it, tick it off." },
+  // Phase 4
+  { id: "4.0", p: "P4", h: 8, where: "mac", t: "Roadmap reading: Nano-vLLM end to end (scheduler, block manager, model runner, CUDA graphs)", c: "Annotated call graph from generate() to one token; mapped to your KV and scheduling simulators", o: "You've read a small, working copy of vLLM and can explain what each part does." },
+  { id: "4.1", p: "P4", h: 3, where: "mac", t: "vLLM internals: scheduler, block manager, CUDA graphs", c: "Notes mapped to your simulators", o: "You know how real vLLM's scheduler and memory manager work, and you match them to your pretend versions." },
+  { id: "4.2", p: "P4", h: 4, where: "gpu", t: "vLLM runtime adapter", c: "Same harness, same workloads", o: "vLLM runs through your measuring tool, just like the plain AI." },
+  { id: "4.3", p: "P4", h: 4, where: "gpu", t: "E8: HF baseline vs vLLM, concurrency 1→32", c: "Comparison plots", o: "Charts show how much faster vLLM is than plain PyTorch as more people ask questions." },
+  { id: "4.4", p: "P4", h: 4, where: "gpu", t: "Nsight Systems on vLLM: kernel mix, CUDA graphs, gaps", c: "Profiling write-up #2", o: "An x-ray of vLLM shows why it keeps the GPU busier." },
+  { id: "4.5", p: "P4", h: 3, where: "gpu", t: "E2 check: vLLM KV usage vs simulator prediction", c: "Agreement/disagreement explained", o: "You check whether your memory game predicted vLLM's real memory use." },
+  { id: "4.6", p: "P4", h: 3, where: "gpu", t: "E3 on GPU: static (HF) vs continuous (vLLM) batching", c: "Sim vs real compared", o: "You compare your pretend group-serving results with the real GPU." },
+  { id: "4.7", p: "P4", h: 5, where: "gpu", t: "E5 deep dive: prefill (GEMM) vs decode (GEMV) with ncu", c: "Compute- vs memory-bound shown with metrics", o: "You prove with GPU counters that reading the question is limited by math, and writing words is limited by memory." },
+  { id: "4.8", p: "P4", h: 3, where: "gpu", t: "E7a: FP32 vs FP16 vs BF16", c: "Memory, latency, throughput explained", o: "You show how using smaller numbers saves memory and time." },
+  { id: "4.17", p: "P4", h: 2, where: "mac", t: "Roadmap reading: LLM.int8(), GPTQ, AWQ, SmoothQuant + 'A Visual Guide to Quantization'", c: "One line per method: what it quantizes and how it protects accuracy", o: "You can explain each way of shrinking the AI's numbers." },
+  { id: "4.9", p: "P4", h: 6, where: "gpu", t: "E7b: INT8 and INT4 weight-only (AWQ/GPTQ) + quality proxy", c: "Perplexity/accuracy proxy alongside speed", o: "You shrink the AI's numbers even more and check that it still answers well." },
+  { id: "4.10", p: "P4", h: 4, where: "gpu", t: "When doesn't INT4 help? Batch sweep + dequantization overhead in ncu", c: "Crossover point explained", o: "You find the point where shrinking stops helping, and explain why." },
+  { id: "4.11", p: "P4", h: 6, where: "gpu", t: "TensorRT-LLM: container + engine build", c: "Engine builds for the chosen model", o: "TensorRT-LLM builds a super-optimized version of your AI." },
+  { id: "4.12", p: "P4", h: 5, where: "gpu", t: "TRT-LLM adapter, runs, comparison", c: "Three-way runtime comparison", o: "Charts compare all three engines on the same test." },
+  { id: "4.13", p: "P4", h: 3, where: "gpu", t: "Nsight on TRT-LLM: fused kernels", c: "Profiling write-up #3", o: "An x-ray shows the joined-up programs that make TensorRT-LLM fast." },
+  { id: "4.14", p: "P4", h: 4, where: "gpu", t: "Prefix caching + chunked prefill in vLLM: on vs off", c: "TTFT and ITL P99 on a shared-prefix workload with each feature on/off; compared with your Phase 1 and 1b simulators", o: "You show that remembering repeated question starts, and splitting long questions into pieces, makes answers arrive faster.", opt: true },
+  { id: "4.16", p: "P4", h: 4, where: "gpu", t: "Speculative decoding in vLLM (n-gram and a draft/EAGLE model)", c: "Acceptance rate, ITL and throughput vs batch size; where it stops helping", o: "A small helper guesses the next words and the big AI checks them. You measure when that makes things faster.", opt: true },
+  { id: "4.15", p: "P4", h: 4, where: "mac", t: "Write docs/runtime-comparison.md", c: "Mechanisms, not just 'X is faster'", o: "A page explaining why the fast engines are fast, not just that they are." },
+  { id: "4.B", p: "P4", h: 4, where: "mac", t: "Buffer: Phase 4", c: "Slack for overruns", o: "Spare time in case something takes longer. If you don't need it, tick it off." },
+  // Phase 5
+  { id: "5.0", p: "P5", h: 2, where: "mac", t: "Roadmap reading: LiteLLM proxy docs, SSE (MDN), vLLM OpenAI-compatible server", c: "Notes: which gateway features (routing, fallbacks, rate limits) your server needs and which it leaves out", o: "You know what a front door for AI servers does, and what yours needs." },
+  { id: "5.1", p: "P5", h: 5, where: "mac", t: "FastAPI: completions + chat, SSE streaming, request IDs", c: "Streams from the mock runtime", o: "Your own server sends answers word by word, like a chat app does." },
+  { id: "5.2", p: "P5", h: 4, where: "mac", t: "Timeouts, cancellation on disconnect, validation, size limits, API key", c: "Tests for each", o: "Your server blocks bad, too-big or too-slow requests, and only lets in people with a key." },
+  { id: "5.3", p: "P5", h: 4, where: "mac", t: "Queue/scheduler in front of the runtime", c: "Queue time measured", o: "Questions wait in a line, and you measure how long they wait." },
+  { id: "5.4", p: "P5", h: 3, where: "mac", t: "Health/readiness, graceful shutdown, model version, structured logs", c: "Probes behave correctly during model load", o: "The server can say 'I'm alive' and 'I'm ready', and shuts down without losing answers." },
+  { id: "5.5", p: "P5", h: 4, where: "mac", t: "Prometheus metrics (TTFT, ITL, queue, tokens/s, errors) + GPU metrics", c: "/metrics scraped", o: "Your server reports its speed numbers so a monitor can read them." },
+  { id: "5.6", p: "P5", h: 3, where: "mac", t: "Grafana dashboard", c: "An inference engineer could use it", o: "A dashboard shows the server's health at a glance." },
+  { id: "5.7", p: "P5", h: 4, where: "gpu", t: "Docker image: pinned CUDA, NVIDIA Container Toolkit, healthcheck", c: "Runs on the GPU VM", o: "Your server is packed into a box (a container) that runs on the GPU computer." },
+  { id: "5.8", p: "P5", h: 5, where: "gpu", t: "E9: open-loop load test, arrival-rate sweep → saturation point", c: "P99 vs throughput curve, knee identified", o: "You send more and more questions until the server gets too slow, and find that breaking point." },
+  { id: "5.9", p: "P5", h: 5, where: "gpu", t: "Minimal K8s: k3s + GPU Operator, probes, rolling update", c: "GPU pod serving via a Service", o: "Kubernetes runs your server on the GPU and can update it without stopping it." },
+  { id: "5.10", p: "P5", h: 3, where: "mac", t: "CI: tests + lint + mock-runtime regression check", c: "GitHub Actions green", o: "Every time you push code, the tests run by themselves." },
+  { id: "5.B", p: "P5", h: 2, where: "mac", t: "Buffer: Phase 5", c: "Slack for overruns", o: "Spare time in case something takes longer. If you don't need it, tick it off." },
+  // Phase 6
+  { id: "6.1", p: "P6", h: 3, where: "mac", t: "Regenerate all plots from result files; consistency check", c: "No hand-copied numbers anywhere", o: "Every chart is redrawn straight from the results, with no numbers typed by hand." },
+  { id: "6.2", p: "P6", h: 10, where: "mac", t: "Write the performance report: methodology + Q1–Q10", c: "Every claim links to evidence", o: "The big report answers all ten questions, each with proof." },
+  { id: "6.3", p: "P6", h: 3, where: "mac", t: "Final architecture diagram + README polish", c: "Repo readable in 5 minutes", o: "Someone new can understand your project in five minutes." },
+  { id: "6.4", p: "P6", h: 2, where: "mac", t: "Demo walkthrough recording", c: "Short video/GIF", o: "A short video shows your project working." },
+  { id: "6.5", p: "P6", h: 3, where: "mac", t: "Mock interview: explain each question aloud; fix gaps", c: "No question you can't answer with evidence", o: "You can answer every question out loud, with proof." },
+  { id: "6.B", p: "P6", h: 2, where: "mac", t: "Buffer: Phase 6", c: "Slack for overruns", o: "Spare time in case something takes longer. If you don't need it, tick it off." },
+  // Project 2 (after the lab): roadmap Modules 6 and 7
+  { id: "7.1", p: "P7", h: 6, where: "mac", t: "Read the Ultra-Scale Playbook: data, tensor, pipeline and expert parallelism", c: "Memory and communication math for each parallelism written down", o: "You can explain the different ways to split a giant AI across many GPUs." },
+  { id: "7.2", p: "P7", h: 4, where: "mac", t: "Read 'How to Scale Your Model': sharding and inference chapters", c: "Notes: TP communication cost vs batch size; when to add PP", o: "You know when spreading an AI over more GPUs helps, and when it just adds chatter between them." },
+  { id: "7.3", p: "P7", h: 6, where: "gpu", t: "TP=2 on two GPUs (Kaggle 2×T4) vs TP=1 + quantization", c: "Latency/throughput for both; NCCL all-reduce time visible in a profile", o: "You run one AI on two GPUs and show whether it beats one GPU using smaller numbers." },
+  { id: "7.4", p: "P7", h: 6, where: "mac", t: "Ray + Ray Serve basics (Anyscale free course)", c: "Toy Ray Serve app with two replicas runs locally", o: "You can make several copies of a program share the work." },
+  { id: "7.5", p: "P7", h: 10, where: "mac", t: "KubeRay on kind: two model replicas behind your server, autoscaling on queue depth", c: "Load test shows replicas scaling up and back down", o: "When lots of people arrive, more AI copies start by themselves; when they leave, the copies stop." },
+  { id: "7.6", p: "P7", h: 10, where: "mac", t: "Gateway: route across several backends with fallbacks and per-user rate limits", c: "Kill one backend mid-test and requests fail over; per-user limits enforced in tests", o: "If one AI server breaks, questions automatically go to another one." },
+  { id: "7.7", p: "P7", h: 8, where: "gpu", t: "Rent 4 GPUs: Llama-3.3-70B with TP=4 (FP8 or AWQ), benchmarked with your harness", c: "Result files + Nsight capture + cost per 1M tokens", o: "You run a really big AI across four GPUs and measure its speed and cost." },
+  { id: "7.8", p: "P7", h: 2, where: "mac", t: "Memory math for a 405B model", c: "Weights, KV per token and minimum GPUs at FP16 vs FP8, written down", o: "You can show on paper why a giant AI needs at least eight big GPUs." },
+  { id: "7.9", p: "P7", h: 3, where: "mac", t: "Read DistServe / Splitwise + vLLM and SGLang disaggregated prefill/decode docs", c: "Notes: when separating prefill and decode GPUs pays off", o: "You can explain why some systems use different GPUs for reading questions and for writing answers." },
+  { id: "7.10", p: "P7", h: 6, where: "gpu", t: "Prefix/KV-aware routing experiment (llm-d router or your own)", c: "Cache hit rate and TTFT: round-robin vs prefix-aware routing", o: "Questions that start the same way go to the same server, so it remembers and answers faster.", opt: true },
+  { id: "7.11", p: "P7", h: 12, where: "mac", t: "System design: six written answers using your cost calculator", c: "Six one-page designs with numbers: 500 users on 4×H100, self-host vs API cost, multi-tenant LoRA, gateway, long-context RAG, node failure", o: "You can design a whole AI serving system on paper and back it up with numbers." },
+  { id: "7.12", p: "P7", h: 4, where: "mac", t: "Mock interviews on the six designs", c: "Recorded answers; gaps listed and fixed", o: "You practise explaining your designs out loud until it feels easy." },
+  { id: "7.13", p: "P7", h: 6, where: "mac", t: "Write-up / blog post on Project 2", c: "Published post with your own measurements", o: "You share what you learned so others, including recruiters, can see it." },
+  { id: "7.B", p: "P7", h: 6, where: "mac", t: "Buffer: Project 2", c: "Slack for overruns", o: "Spare time in case something takes longer. If you don't need it, tick it off." },
+];
+
+// Lab tasks count toward the hard deadline; Project 2 (after: true) does not.
+const isLab = t => !PHASES.find(p => p.id === t.p).after;
+
+/* ======================================================================
+   STATE
+   ====================================================================== */
+const KEY = "llm-inference-lab-schedule-v1";
+const PLAN_VERSION = 3; // v3: aligned with the 150-Day Sprint (per-day hours, estimates +25%, optional/buffer/TRT-LLM cut)
+const SPRINT150 = {"table":{"2026-10-12":0,"2026-10-13":2.5,"2026-10-14":2.5,"2026-10-15":2.5,"2026-10-16":2.5,"2026-10-17":2.5,"2026-10-18":0,"2026-10-19":2.5,"2026-10-20":0,"2026-10-21":0,"2026-10-22":0,"2026-10-23":0,"2026-10-24":0,"2026-10-25":0,"2026-10-26":2.5,"2026-10-27":2.5,"2026-10-28":2.5,"2026-10-29":2.5,"2026-10-30":2.5,"2026-10-31":2.5,"2026-11-01":0,"2026-11-02":2.5,"2026-11-03":2.5,"2026-11-04":2.5,"2026-11-05":2.5,"2026-11-06":2.5,"2026-11-07":2.5,"2026-11-08":0,"2026-11-09":3.42,"2026-11-10":2.5,"2026-11-11":3.42,"2026-11-12":2.5,"2026-11-13":3.42,"2026-11-14":2.5,"2026-11-15":0,"2026-11-16":1.25,"2026-11-17":1.25,"2026-11-18":1.25,"2026-11-19":1.25,"2026-11-20":1.25,"2026-11-21":1.25,"2026-11-22":0,"2026-11-23":3.42,"2026-11-24":2.5,"2026-11-25":3.42,"2026-11-26":2.5,"2026-11-27":3.42,"2026-11-28":2.5,"2026-11-29":0,"2026-11-30":3.42,"2026-12-01":2.5,"2026-12-02":3.42,"2026-12-03":2.5,"2026-12-04":3.42,"2026-12-05":2.5,"2026-12-06":0,"2026-12-07":3.42,"2026-12-08":2.5,"2026-12-09":3.42,"2026-12-10":2.5,"2026-12-11":3.42,"2026-12-12":2.5,"2026-12-13":0,"2026-12-14":3.42,"2026-12-15":2.5,"2026-12-16":3.42,"2026-12-17":2.5,"2026-12-18":3.42,"2026-12-19":2.5,"2026-12-20":0,"2026-12-21":3.42,"2026-12-22":2.5,"2026-12-23":3.42,"2026-12-24":2.5,"2026-12-25":3.42,"2026-12-26":2.5,"2026-12-27":0,"2026-12-28":1.25,"2026-12-29":1.25,"2026-12-30":1.25,"2026-12-31":1.25,"2027-01-01":1.25,"2027-01-02":1.25,"2027-01-03":0,"2027-01-04":3.42,"2027-01-05":2.5,"2027-01-06":3.42,"2027-01-07":2.5,"2027-01-08":3.42,"2027-01-09":2.5,"2027-01-10":0,"2027-01-11":3.42,"2027-01-12":2.5,"2027-01-13":3.42,"2027-01-14":2.5,"2027-01-15":3.42,"2027-01-16":2.5,"2027-01-17":0,"2027-01-18":3.42,"2027-01-19":5.5,"2027-01-20":6.42,"2027-01-21":5.5,"2027-01-22":6.42,"2027-01-23":5.5,"2027-01-24":0,"2027-01-25":6.42,"2027-01-26":5.5,"2027-01-27":6.42,"2027-01-28":5.5,"2027-01-29":6.42,"2027-01-30":5.5,"2027-01-31":0,"2027-02-01":6.42,"2027-02-02":5.5,"2027-02-03":6.42,"2027-02-04":5.5,"2027-02-05":6.42,"2027-02-06":5.5,"2027-02-07":0,"2027-02-08":2.75,"2027-02-09":2.75,"2027-02-10":2.75,"2027-02-11":2.75,"2027-02-12":2.75,"2027-02-13":2.75,"2027-02-14":0,"2027-02-15":6.42,"2027-02-16":5.5,"2027-02-17":6.42,"2027-02-18":5.5,"2027-02-19":6.42,"2027-02-20":5.5,"2027-02-21":0,"2027-02-22":6.42,"2027-02-23":5.5,"2027-02-24":6.42,"2027-02-25":5.5,"2027-02-26":6.42,"2027-02-27":5.5,"2027-02-28":0,"2027-03-01":6.42,"2027-03-02":5.5,"2027-03-03":6.42,"2027-03-04":5.5,"2027-03-05":6.42,"2027-03-06":5.5,"2027-03-07":0,"2027-03-08":6.42,"2027-03-09":5.5,"2027-03-10":6.42},"est":{"0.1":2.5,"0.2":4.0,"0.3":4.0,"0.4":4.0,"0.5":6.0,"0.6":2.5,"0.7":5.0,"0.8":4.0,"0.9":5.0,"0.10":4.0,"0.12":2.0,"0.11":1.0,"1.0":2.0,"1.1":4.0,"1.2":2.5,"1.3":4.0,"1.4":5.0,"1.5":4.0,"1.6":4.0,"1.7":2.5,"1b.1":2.5,"1b.2":2.5,"1b.3":6.0,"1b.4":4.0,"1b.5":2.5,"2.0":4.0,"2.1":4.0,"2.2":6.0,"2.3":2.5,"2.4":5.0,"2.5":4.0,"2.6":5.0,"2.7":4.0,"2.8":5.0,"2.10":2.5,"2.9":4.0,"3.0":4.0,"3.1":6.0,"3.2":6.0,"3.3":9.0,"3.4":15.0,"3.5":1.0,"3.11":2.5,"3.6":10.0,"3.7":4.0,"3.8":7.5,"3.9":5.0,"3.10":4.0,"4.0":10.0,"4.1":4.0,"4.2":5.0,"4.3":5.0,"4.4":5.0,"4.5":4.0,"4.6":4.0,"4.7":6.0,"4.8":4.0,"4.17":2.5,"4.9":7.5,"4.10":5.0,"4.15":5.0,"6.1":4.0,"6.2":12.5,"6.3":4.0,"6.5":4.0,"5.0":2.5,"5.1":6.0,"5.2":5.0,"5.3":5.0,"5.4":4.0,"5.5":5.0,"5.6":4.0,"5.10":4.0,"5.7":5.0,"5.8":6.0,"5.9":6.0},"cut":["1.8","1b.6","4.14","4.16","4.11","4.12","4.13","6.4","0.B","1.B","1b.B","2.B","3.B","4.B","5.B","6.B"],"done":["0.1"],"hoursAfter":2.5};
+const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+const pad = n => String(n).padStart(2, "0");
+const toKey = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const fromKey = k => { const [y, m, d] = k.split("-").map(Number); return new Date(y, m - 1, d); };
+const addDays = (k, n) => { const d = fromKey(k); d.setDate(d.getDate() + n); return toKey(d); };
+const diffDays = (a, b) => Math.round((fromKey(b) - fromKey(a)) / 86400000);
+const maxKey = (a, b) => (!a ? b : !b ? a : a > b ? a : b);
+const minKey = (a, b) => (!a ? b : !b ? a : a < b ? a : b);
+const fmt = k => { if (!k) return "—"; const d = fromKey(k); return `${DOW[d.getDay()]} ${d.getDate()} ${MON[d.getMonth()]}`; };
+const fmtShort = k => { if (!k) return "—"; const d = fromKey(k); return `${d.getDate()} ${MON[d.getMonth()]}`; };
+const hrs = h => (Math.round(h * 10) / 10).toString().replace(/\.0$/, "") + "h";
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const rangeKeys = (a, b) => { const out = []; for (let k = a; k <= b; k = addDays(k, 1)) out.push(k); return out; };
+
+const DEFAULT_SETTINGS = {
+  start: "2026-10-12",
+  hoursPerDay: SPRINT150.hoursAfter,
+  workdays: [false, true, true, true, true, true, true],
+  holidays: rangeKeys("2026-10-20", "2026-10-25"),
+  overrides: {},
+  asOf: "",
+};
+
+let state = load();
+
+function load() {
+  let s = null;
+  try { s = JSON.parse(localStorage.getItem(KEY)); } catch (e) { s = null; }
+  s = s && typeof s === "object" ? s : {};
+  s.settings = { ...DEFAULT_SETTINGS, ...(s.settings || {}) };
+  s.tasks = s.tasks || {};
+  s.logs = Array.isArray(s.logs) ? s.logs : [];
+  s.ui = s.ui || { tab: "today" };
+  return migrate(s);
+}
+// A new plan version moves the start date and rebuilds the frozen deadlines
+// from the new task list. Ticked tasks, logged hours and edited estimates are kept.
+function to150(s) {
+  s.settings.overrides = { ...SPRINT150.table };
+  s.settings.hoursPerDay = SPRINT150.hoursAfter;
+  s.settings.workdays = [false, true, true, true, true, true, true];
+  s.tasks = s.tasks || {};
+  for (const id of SPRINT150.cut) { const o = (s.tasks[id] = s.tasks[id] || {}); if (!o.done) o.cut = true; }
+  for (const [id, h] of Object.entries(SPRINT150.est)) { const o = (s.tasks[id] = s.tasks[id] || {}); if (o.est == null) o.est = h; }
+  for (const id of SPRINT150.done) { const o = (s.tasks[id] = s.tasks[id] || {}); if (!o.done) { o.done = true; o.doneOn = '2026-10-12'; } }
+}
+function migrate(s) {
+  if (s.planVersion !== PLAN_VERSION && (s.planVersion || 0) < 3) to150(s);
+  if (!s.baseline || s.planVersion !== PLAN_VERSION) {
+    if (s.planVersion !== PLAN_VERSION) s.settings.start = DEFAULT_SETTINGS.start;
+    s.baseline = computeBaseline(s.settings, s.tasks || {});
+    s.planVersion = PLAN_VERSION;
+  }
+  return s;
+}
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(state)); }
+  catch (e) { toast("Couldn't save in this browser. Use Export to keep a backup."); }
+}
+
+const task = id => TASKS.find(t => t.id === id);
+const tstate = id => (state.tasks[id] = state.tasks[id] || {});
+const est = t => { const o = state.tasks[t.id]; return o && o.est != null ? o.est : t.h; };
+const logged = id => state.logs.filter(l => l.id === id).reduce((a, l) => a + l.h, 0);
+const isDone = id => !!(state.tasks[id] && state.tasks[id].done);
+const isCut = id => !!(state.tasks[id] && state.tasks[id].cut);
+const today = () => state.settings.asOf || toKey(new Date());
+
+/* ======================================================================
+   SCHEDULER
+   Tasks run in order; each day's capacity is filled greedily and tasks may
+   split across days. Unfinished work is always re-planned from today.
+   ====================================================================== */
+function capacity(settings, k) {
+  if (settings.holidays.includes(k)) return 0;
+  if (settings.overrides[k] != null) return Number(settings.overrides[k]);
+  if (!settings.workdays[fromKey(k).getDay()]) return 0;
+  return Number(settings.hoursPerDay);
+}
+
+function plan(settings, items, from, usedOn = {}) {
+  const byTask = {}, byDay = {};
+  let day = from, left = Math.max(0, capacity(settings, day) - (usedOn[day] || 0)), guard = 0, finish = null, stuck = false;
+  for (const it of items) {
+    let rem = it.rem;
+    const rec = { start: null, end: null, chunks: [] };
+    while (rem > 1e-9 && !stuck) {
+      while (left <= 1e-9) {
+        day = addDays(day, 1);
+        left = Math.max(0, capacity(settings, day) - (usedOn[day] || 0));
+        if (++guard > 1500) { stuck = true; break; }
+      }
+      if (stuck) break;
+      const h = Math.min(rem, left);
+      rec.chunks.push({ date: day, h });
+      (byDay[day] = byDay[day] || []).push({ id: it.id, h });
+      rec.start = rec.start || day;
+      rec.end = day;
+      rem -= h; left -= h;
+    }
+    byTask[it.id] = rec;
+    finish = maxKey(finish, rec.end);
+  }
+  return { byTask, byDay, finish, stuck };
+}
+
+function computeBaseline(settings, tstates = {}) {
+  const e = t => (tstates[t.id] && tstates[t.id].est != null ? tstates[t.id].est : t.h);
+  const items = TASKS.filter(t => !(tstates[t.id] && tstates[t.id].cut)).map(t => ({ id: t.id, rem: e(t) }));
+  const p = plan(settings, items, settings.start);
+  const phase = {};
+  for (const ph of PHASES) {
+    const ts = TASKS.filter(t => t.p === ph.id).map(t => p.byTask[t.id]).filter(Boolean);
+    phase[ph.id] = { start: ts.reduce((a, r) => minKey(a, r.start), null), end: ts.reduce((a, r) => maxKey(a, r.end), null) };
+  }
+  const taskEnd = Object.fromEntries(TASKS.map(t => [t.id, p.byTask[t.id] ? p.byTask[t.id].end : null]));
+  const final = TASKS.filter(isLab).reduce((a, t) => maxKey(a, p.byTask[t.id] && p.byTask[t.id].end), null);
+  return { phase, taskEnd, final, finalAll: p.finish, createdOn: toKey(new Date()), totalHours: TASKS.filter(t => isLab(t) && !(tstates[t.id] && tstates[t.id].cut)).reduce((a, t) => a + e(t), 0) };
+}
+
+function project() {
+  const s = state.settings, now = today();
+  const from = maxKey(s.start, now);
+  const usedOn = {};
+  for (const l of state.logs) if (l.date >= from) usedOn[l.date] = (usedOn[l.date] || 0) + l.h;
+  const items = TASKS.filter(t => !isDone(t.id) && !isCut(t.id)).map(t => {
+    const r = est(t) - logged(t.id);
+    return { id: t.id, rem: r > 1e-9 ? r : 0.5, over: r <= 1e-9 };
+  });
+  const p = plan(s, items, from, usedOn);
+  p.items = items;
+  const phase = {};
+  for (const ph of PHASES) {
+    const ts = TASKS.filter(t => t.p === ph.id && !isCut(t.id));
+    const open = ts.filter(t => !isDone(t.id));
+    const doneDates = ts.filter(t => isDone(t.id)).map(t => state.tasks[t.id].doneOn).filter(Boolean);
+    const logDates = state.logs.filter(l => ts.some(t => t.id === l.id)).map(l => l.date);
+    let end = open.reduce((a, t) => maxKey(a, p.byTask[t.id] && p.byTask[t.id].end), null);
+    if (!end) end = doneDates.reduce(maxKey, null);
+    let start = logDates.reduce(minKey, null);
+    start = minKey(start, open.reduce((a, t) => minKey(a, p.byTask[t.id] && p.byTask[t.id].start), null));
+    const totalH = ts.reduce((a, t) => a + est(t), 0);
+    const doneH = ts.reduce((a, t) => a + (isDone(t.id) ? est(t) : Math.min(logged(t.id), est(t))), 0);
+    phase[ph.id] = { start, end, totalH, doneH, complete: open.length === 0 && ts.length > 0 };
+  }
+  const labItems = items.filter(i => isLab(task(i.id)));
+  const remaining = labItems.reduce((a, i) => a + i.rem, 0);
+  const finish = labItems.reduce((a, i) => maxKey(a, p.byTask[i.id] && p.byTask[i.id].end), null)
+    || TASKS.filter(t => isLab(t) && isDone(t.id)).map(t => state.tasks[t.id].doneOn).reduce(maxKey, null);
+  const finishAll = maxKey(p.finish, finish);
+  // Days with capacity between today and the hard deadline.
+  let capToDeadline = 0, daysToDeadline = 0;
+  for (let k = from; k <= state.baseline.final; k = addDays(k, 1)) {
+    const c = Math.max(0, capacity(s, k) - (usedOn[k] || 0));
+    if (c > 0 || (!s.holidays.includes(k) && s.workdays[fromKey(k).getDay()])) daysToDeadline++;
+    capToDeadline += c;
+  }
+  return { ...p, phase, remaining, finish, finishAll, capToDeadline, daysToDeadline, from };
+}
+
+/* ======================================================================
+   ACTIONS
+   ====================================================================== */
+function setDone(id, val) {
+  const o = tstate(id), t = task(id);
+  if (val) {
+    o.done = true; o.doneOn = today();
+    const rem = est(t) - logged(id);
+    if (rem > 1e-9) state.logs.push({ id, date: today(), h: rem, auto: true });
+  } else {
+    o.done = false; delete o.doneOn;
+    state.logs = state.logs.filter(l => !(l.id === id && l.auto));
+  }
+  commit(val ? `Done: ${id}` : `Reopened ${id}`);
+}
+function setLogged(id, total) {
+  const cur = logged(id);
+  const d = Math.round((total - cur) * 100) / 100;
+  if (Math.abs(d) > 1e-9) state.logs.push({ id, date: today(), h: d });
+  commit();
+}
+function setEst(id, v) { const t = task(id); const o = tstate(id); if (v === t.h) delete o.est; else o.est = v; commit(); }
+function toggleCut(id) { const o = tstate(id); o.cut = !o.cut; commit(o.cut ? `Cut ${id} from scope` : `Restored ${id}`); }
+function commit(msg) { save(); render(); if (msg) toast(msg); }
+
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById("toast");
+  el.textContent = msg; el.classList.add("on");
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove("on"), 1800);
+}
+
+/* ======================================================================
+   RENDER
+   ====================================================================== */
+const TABS = [["today", "Today"], ["timeline", "Timeline"], ["days", "Day by day"], ["tasks", "Tasks"], ["settings", "Settings"]];
+let P;
+
+function render() {
+  P = project();
+  renderHeader();
+  const tabs = document.getElementById("tabs");
+  tabs.innerHTML = TABS.map(([k, l]) => `<button class="${state.ui.tab === k ? "on" : ""}" data-tab="${k}">${l}</button>`).join("");
+  const v = document.getElementById("view");
+  v.innerHTML = ({ today: viewToday, timeline: viewTimeline, days: viewDays, tasks: viewTasks, settings: viewSettings })[state.ui.tab]();
+  if (state.ui.tab === "days") { const el = document.querySelector(".day.today"); if (el && !render.scrolled) { el.scrollIntoView({ block: "center" }); render.scrolled = true; } }
+}
+
+function renderHeader() {
+  const s = state.settings, B = state.baseline, now = today();
+  const scope = TASKS.filter(t => isLab(t) && !isCut(t.id));
+  const total = scope.reduce((a, t) => a + est(t), 0);
+  const done = scope.reduce((a, t) => a + (isDone(t.id) ? est(t) : Math.min(logged(t.id), est(t))), 0);
+  const pct = total ? Math.round((done / total) * 100) : 0;
+  const nDone = scope.filter(t => isDone(t.id)).length;
+  const slip = P.finish ? diffDays(B.final, P.finish) : 0;
+  const need = P.daysToDeadline ? P.remaining / P.daysToDeadline : Infinity;
+  const gpuH = scope.filter(t => t.where === "gpu" && !isDone(t.id)).reduce((a, t) => a + Math.max(0, est(t) - logged(t.id)), 0);
+
+  document.getElementById("sub").textContent =
+    `Starts ${fmt(s.start)} · ${s.hoursPerDay}h/day · holidays ${s.holidays.length ? fmtShort(s.holidays[0]) + "–" + fmtShort(s.holidays[s.holidays.length - 1]) : "none"} · as of ${fmt(now)}${s.asOf ? " (simulated)" : ""}`;
+
+  const statusCls = P.stuck ? "bad" : slip > 0 ? "bad" : slip === 0 ? "warn" : "ok";
+  const statusTxt = P.stuck ? "Can't schedule" : slip > 0 ? `${slip}d late` : slip === 0 ? "No slack" : `${-slip}d ahead`;
+  document.getElementById("cards").innerHTML = `
+    <div class="card"><div class="k">Progress</div><div class="v">${pct}%</div><div class="s">${nDone}/${scope.length} tasks · ${hrs(done)} of ${hrs(total)}</div><div class="bar"><i style="width:${pct}%"></i></div></div>
+    <div class="card"><div class="k">Hard deadline</div><div class="v">${fmtShort(B.final)}</div><div class="s">${fmt(B.final)} · baseline</div></div>
+    <div class="card"><div class="k">Projected finish</div><div class="v">${fmtShort(P.finish)}</div><div class="s"><span class="pill ${statusCls}">${statusTxt}</span></div></div>
+    <div class="card"><div class="k">Required pace</div><div class="v">${isFinite(need) ? hrs(need) + "/day" : "—"}</div><div class="s">${hrs(P.remaining)} left over ${P.daysToDeadline} working days</div></div>
+    <div class="card"><div class="k">GPU work left</div><div class="v">${hrs(gpuH)}</div><div class="s">billable session time (approx.)</div></div>`;
+
+  const late = TASKS.filter(t => !isDone(t.id) && !isCut(t.id) && state.baseline.taskEnd[t.id] < now);
+  let html = "";
+  if (P.stuck) html = `<div class="banner bad"><b>No working capacity.</b> Check hours/day and workdays in Settings.</div>`;
+  else if (slip > 0) {
+    const extra = need - s.hoursPerDay;
+    html = `<div class="banner bad"><b>Behind by ${slip} day${slip > 1 ? "s" : ""}.</b> To still finish by ${fmt(B.final)} you need about <b>${hrs(need)}/day</b>${extra > 0 ? ` (+${hrs(extra)}/day)` : ""}, or cut optional work / use buffer tasks. ${late.length} task${late.length === 1 ? " is" : "s are"} past their baseline date.</div>`;
+  } else if (late.length) html = `<div class="banner warn"><b>${late.length} task${late.length === 1 ? " is" : "s are"} past their baseline date</b>, but the overall finish still holds thanks to buffers.</div>`;
+  else html = `<div class="banner ok"><b>On track.</b> ${slip < 0 ? `${-slip} day${slip < -1 ? "s" : ""} of slack before the hard deadline.` : "Exactly on the baseline."}</div>`;
+  document.getElementById("banner").innerHTML = html;
+}
+
+function phaseOf(id) { return PHASES.find(p => p.id === id); }
+function wherePill(w) { return `<span class="pill ${w}">${w === "gpu" ? "GPU" : "Mac"}</span>`; }
+
+function taskLine(t, h, opts = {}) {
+  const done = isDone(t.id);
+  return `<div class="chunk">
+    <input type="checkbox" data-done="${t.id}" ${done ? "checked" : ""} aria-label="Mark ${esc(t.id)} done">
+    <div><span class="dot" style="display:inline-block;background:${phaseOf(t.p).color};margin-right:6px"></span><span class="muted">${esc(t.id)}</span> ${done ? `<s class="muted">${esc(t.t)}</s>` : esc(t.t)} ${opts.pill ? wherePill(t.where) : ""}
+      ${opts.crit && t.o ? `<div class="kid"><b>Outcome:</b> ${esc(t.o)}</div>` : ""}
+      ${opts.crit ? `<div class="muted" style="font-size:12.5px">Done when: ${esc(t.c)}</div>` : ""}</div>
+    ${h != null ? `<span class="h">${hrs(h)}</span>` : ""}</div>`;
+}
+
+function viewToday() {
+  const now = today(), cap = capacity(state.settings, now);
+  const chunks = (P.byDay[now] || []);
+  const doneToday = TASKS.filter(t => isDone(t.id) && state.tasks[t.id].doneOn === now);
+  const loggedToday = state.logs.filter(l => l.date === now).reduce((a, l) => a + l.h, 0);
+  let next = [];
+  for (let k = addDays(now, 1), n = 0; n < 4 && k <= (P.finishAll || now); k = addDays(k, 1)) {
+    if (P.byDay[k]) { next.push(k); n++; }
+  }
+  const deadlinesSoon = PHASES.filter(ph => { const d = state.baseline.phase[ph.id].end; return d >= now && diffDays(now, d) <= 7 && !P.phase[ph.id].complete; });
+  return `
+  <div class="grid2">
+    <section class="panel pad">
+      <h3>${fmt(now)} ${state.settings.holidays.includes(now) ? '<span class="pill warn">Holiday</span>' : ""}</h3>
+      <p class="muted" style="margin:0 0 10px">${now < state.settings.start ? "Before the start date" : `Capacity ${hrs(cap)} · logged ${hrs(loggedToday)}`}</p>
+      ${chunks.length ? chunks.map(c => taskLine(task(c.id), c.h, { pill: true, crit: true })).join("") : `<p class="muted">${now < state.settings.start ? `Nothing yet. Work starts ${fmt(state.settings.start)}.` : cap === 0 ? "Rest day." : "Nothing left planned today."}</p>`}
+      ${doneToday.length ? `<h3 style="margin-top:14px">Completed today</h3>${doneToday.map(t => taskLine(t, null)).join("")}` : ""}
+    </section>
+    <section class="panel pad">
+      <h3>Coming up</h3>
+      ${next.length ? next.map(k => `<div style="margin-bottom:8px"><div class="muted" style="font-size:12px;font-weight:600">${fmt(k)}</div>${P.byDay[k].map(c => taskLine(task(c.id), c.h)).join("")}</div>`).join("") : '<p class="muted">Nothing scheduled.</p>'}
+      ${deadlinesSoon.length ? `<h3 style="margin-top:12px">Deadlines within 7 days</h3>${deadlinesSoon.map(ph => {
+        const s = diffDays(state.baseline.phase[ph.id].end, P.phase[ph.id].end);
+        return `<div class="chunk"><span class="dot" style="background:${ph.color};margin-top:5px"></span><div>${esc(ph.name)}<div class="muted" style="font-size:12px">due ${fmt(state.baseline.phase[ph.id].end)} · projected ${fmt(P.phase[ph.id].end)}</div></div><span class="h"><span class="pill ${s > 0 ? "bad" : "ok"}">${s > 0 ? s + "d late" : "on time"}</span></span></div>`;
+      }).join("")}` : ""}
+    </section>
+  </div>`;
+}
+
+function viewTimeline() {
+  const B = state.baseline, s = state.settings, now = today();
+  const start = s.start;
+  const end = addDays(maxKey(B.finalAll || B.final, P.finishAll), 2);
+  const span = diffDays(start, end) + 1;
+  const pct = k => (diffDays(start, k) / span) * 100;
+  const w = (a, b) => ((diffDays(a, b) + 1) / span) * 100;
+  // contiguous holiday ranges
+  const hol = [...s.holidays].sort(); const ranges = [];
+  for (const h of hol) { const r = ranges[ranges.length - 1]; if (r && addDays(r[1], 1) === h) r[1] = h; else ranges.push([h, h]); }
+  const holHtml = ranges.filter(r => r[1] >= start && r[0] <= end).map(r => `<div class="hol" style="left:${pct(maxKey(r[0], start))}%;width:${w(maxKey(r[0], start), minKey(r[1], end))}%"></div>`).join("");
+  const nowHtml = now >= start && now <= end ? `<div class="now" style="left:${pct(now)}%"></div>` : "";
+  // axis ticks every Monday
+  let ticks = ""; for (let k = start; k <= end; k = addDays(k, 1)) if (fromKey(k).getDay() === 1) ticks += `<span style="left:${pct(k)}%">${fmtShort(k)}</span>`;
+
+  const rows = PHASES.map(ph => {
+    const b = B.phase[ph.id], p = P.phase[ph.id];
+    const slip = p.end ? diffDays(b.end, p.end) : 0;
+    const pctDone = p.totalH ? Math.round((p.doneH / p.totalH) * 100) : 0;
+    const proj = p.start && p.end ? `<div class="proj" style="left:${pct(maxKey(p.start, start))}%;width:${w(maxKey(p.start, start), p.end)}%;background:${ph.color}"></div>` : "";
+    return `<div class="tl-row">
+      <div class="tl-label"><span class="dot" style="background:${ph.color}"></span><span title="${esc(ph.name)}">${esc(ph.name.replace(/^Phase /, "P"))}</span>
+        <span class="pill ${p.complete ? "ok" : slip > 0 ? "bad" : ""}" style="margin-left:auto">${p.complete ? "done" : slip > 0 ? "+" + slip + "d" : pctDone + "%"}</span></div>
+      <div class="track">${holHtml}<div class="base" style="left:${pct(b.start)}%;width:${w(b.start, b.end)}%"></div>${proj}<div class="dl" style="left:calc(${pct(b.end) + w(b.end, b.end)}% - 1px)" title="Deadline ${fmt(b.end)}"></div>${nowHtml}</div>
+    </div>`;
+  }).join("");
+
+  const table = PHASES.map(ph => {
+    const b = B.phase[ph.id], p = P.phase[ph.id];
+    const slip = p.end ? diffDays(b.end, p.end) : 0;
+    return `<tr><td><span class="dot" style="display:inline-block;background:${ph.color};margin-right:6px"></span>${esc(ph.name)}</td><td>${esc(ph.where)}</td><td>${hrs(p.totalH)}</td><td>${fmt(b.start)}</td><td><b>${fmt(b.end)}</b></td><td>${fmt(p.end)}</td><td><span class="pill ${p.complete ? "ok" : slip > 0 ? "bad" : "ok"}">${p.complete ? "complete" : slip > 0 ? slip + "d late" : slip < 0 ? -slip + "d early" : "on time"}</span></td></tr>`;
+  }).join("");
+
+  return `<section class="panel tl">
+    <div class="tl-row"><div></div><div class="axis">${ticks}</div></div>
+    ${rows}
+    <div class="legend"><span><i style="border:1.5px dashed var(--muted)"></i>Baseline plan</span><span><i style="background:var(--accent)"></i>Projected (live)</span><span><i style="background:var(--bad);width:3px"></i>Hard deadline</span><span><i style="background:var(--today);width:3px"></i>Today</span><span><i style="background:repeating-linear-gradient(45deg,var(--hol),var(--hol) 3px,transparent 3px,transparent 6px)"></i>Holiday</span></div>
+  </section>
+  <section class="panel" style="margin-top:14px;overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:13px">
+      <thead><tr style="text-align:left;color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.04em">${["Phase", "Where", "Hours", "Starts", "Hard deadline", "Projected", "Status"].map(h => `<th style="padding:10px 12px;border-bottom:1px solid var(--line)">${h}</th>`).join("")}</tr></thead>
+      <tbody>${table.replace(/<td>/g, '<td style="padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap">')}</tbody>
+    </table>
+  </section>`;
+}
+
+function viewDays() {
+  const s = state.settings, B = state.baseline, now = today();
+  const end = maxKey(B.finalAll || B.final, P.finishAll);
+  const deadlinesOn = {};
+  for (const ph of PHASES) (deadlinesOn[B.phase[ph.id].end] = deadlinesOn[B.phase[ph.id].end] || []).push(ph);
+  // Start weeks on Monday.
+  let first = s.start; while (fromKey(first).getDay() !== 1) first = addDays(first, -1);
+  let html = "", weekNo = 0;
+  for (let wk = first; wk <= end; wk = addDays(wk, 7)) {
+    weekNo++;
+    let days = "", planned = 0;
+    for (let i = 0; i < 7; i++) {
+      const k = addDays(wk, i);
+      if (k < s.start || k > end) continue;
+      const cap = capacity(s, k), isHol = s.holidays.includes(k);
+      const past = k < now, isToday = k === now;
+      let body = "";
+      if (past || isToday) {
+        const byId = {};
+        for (const l of state.logs.filter(l => l.date === k)) byId[l.id] = (byId[l.id] || 0) + l.h;
+        body += Object.entries(byId).filter(([, h]) => h > 1e-9).map(([id, h]) => taskLine(task(id), h)).join("");
+      }
+      if (!past) {
+        const ch = P.byDay[k] || [];
+        planned += ch.reduce((a, c) => a + c.h, 0);
+        body += ch.map(c => taskLine(task(c.id), c.h)).join("");
+      }
+      if (deadlinesOn[k]) body += deadlinesOn[k].map(ph => {
+        const met = P.phase[ph.id].complete && P.phase[ph.id].end <= k;
+        return `<div class="flag ${met ? "met" : ""}">⚑ Deadline: ${esc(ph.name)}${met ? " · met" : ""}</div>`;
+      }).join("");
+      if (k === B.final) body += `<div class="flag">⚑ Hard deadline: project complete</div>`;
+      if (!body) body = `<span class="muted">${isHol ? "Holiday" : cap === 0 ? "Rest day" : past ? "Nothing logged" : "Free"}</span>`;
+      days += `<div class="day ${isHol ? "hol" : ""} ${past ? "past" : ""} ${isToday ? "today" : ""}"><div class="d">${fmt(k)}<small>${isHol ? "holiday" : hrs(cap) + " capacity"}${isToday ? " · today" : ""}</small></div><div>${body}</div></div>`;
+    }
+    html += `<section class="panel week"><div class="week-h"><span>Week ${weekNo} · ${fmtShort(maxKey(wk, s.start))} – ${fmtShort(minKey(addDays(wk, 6), end))}</span><span class="muted" style="font-weight:400">${hrs(planned)} planned</span></div>${days}</section>`;
+  }
+  return html;
+}
+
+function viewTasks() {
+  return PHASES.map(ph => {
+    const b = state.baseline.phase[ph.id], p = P.phase[ph.id];
+    const slip = p.end ? diffDays(b.end, p.end) : 0;
+    const rows = TASKS.filter(t => t.p === ph.id).map(t => {
+      const done = isDone(t.id), cut = isCut(t.id), r = P.byTask[t.id];
+      const lg = logged(t.id), e = est(t);
+      const late = !done && !cut && r && r.end > state.baseline.taskEnd[t.id];
+      return `<div class="task ${done ? "done" : ""} ${cut ? "cut" : ""}">
+        <input type="checkbox" data-done="${t.id}" ${done ? "checked" : ""} ${cut ? "disabled" : ""} aria-label="Mark ${esc(t.id)} done">
+        <div><div class="title"><span class="id">${esc(t.id)}</span>${esc(t.t)} ${wherePill(t.where)} ${t.opt ? '<span class="pill warn">optional</span>' : ""} ${lg > e + 1e-9 && !done ? '<span class="pill bad">over estimate</span>' : ""}</div>
+          ${t.o ? `<div class="kid"><b>Outcome:</b> ${esc(t.o)}</div>` : ""}
+          <div class="crit">Done when: ${esc(t.c)}</div></div>
+        <div class="side">
+          <div class="nums"><label>est <input type="number" min="0" step="0.5" value="${e}" data-est="${t.id}"></label><label>spent <input type="number" step="0.5" value="${Math.round(lg * 10) / 10}" data-log="${t.id}"></label></div>
+          <div>${done ? `done ${fmt(state.tasks[t.id].doneOn)}` : cut ? "cut from scope" : r ? `${fmtShort(r.start)} → <b>${fmtShort(r.end)}</b>` : ""} · due ${fmtShort(state.baseline.taskEnd[t.id])} ${late ? '<span class="pill bad">late</span>' : ""}</div>
+          <button class="link" data-cut="${t.id}">${cut ? "restore" : "cut from scope"}</button>
+        </div></div>`;
+    }).join("");
+    return `<section class="panel phase">
+      <div class="phase-h"><div class="name"><span class="dot" style="background:${ph.color}"></span>${esc(ph.name)}</div>
+        <div class="meta"><span>${hrs(p.doneH)} / ${hrs(p.totalH)}</span><span>deadline <b>${fmt(b.end)}</b></span><span>projected ${fmt(p.end)}</span><span class="pill ${p.complete ? "ok" : slip > 0 ? "bad" : "ok"}">${p.complete ? "complete" : slip > 0 ? slip + "d late" : "on time"}</span></div></div>
+      ${rows}</section>`;
+  }).join("");
+}
+
+function viewSettings() {
+  const s = state.settings;
+  const ov = Object.entries(s.overrides).sort();
+  return `<div class="grid2">
+    <section class="panel pad">
+      <h3>Capacity</h3>
+      <div class="field"><span>Start date</span><input type="date" value="${s.start}" data-set="start"></div>
+      <div class="field"><span>Hours per day</span><input type="number" min="0" max="16" step="0.5" value="${s.hoursPerDay}" data-set="hoursPerDay"></div>
+      <div class="field" style="align-items:flex-start"><span>Working days</span><div class="wd">${[1, 2, 3, 4, 5, 6, 0].map(i => `<label><input type="checkbox" data-wd="${i}" ${s.workdays[i] ? "checked" : ""}>${DOW[i]}</label>`).join("")}</div></div>
+      <div class="field"><span>As-of date <span class="muted">(simulate a different “today”)</span></span><span><input type="date" value="${s.asOf}" data-set="asOf"> ${s.asOf ? '<button class="link" data-clear-asof>clear</button>' : ""}</span></div>
+    </section>
+    <section class="panel pad">
+      <h3>Holidays</h3>
+      <div class="tags">${s.holidays.length ? [...s.holidays].sort().map(h => `<span class="tag">${fmt(h)}<button data-rmhol="${h}" aria-label="Remove">×</button></span>`).join("") : '<span class="muted">None</span>'}</div>
+      <div class="field"><span>Add holiday</span><input type="date" data-addhol></div>
+      <h3 style="margin-top:14px">Day overrides</h3>
+      <p class="muted" style="margin:0 0 6px;font-size:12.5px">Set a different number of hours for one date (e.g. 2h on a busy day, 8h on a weekend push).</p>
+      <div class="tags">${ov.length ? ov.map(([d, h]) => `<span class="tag">${fmt(d)}: ${hrs(Number(h))}<button data-rmov="${d}" aria-label="Remove">×</button></span>`).join("") : '<span class="muted">None</span>'}</div>
+      <div class="field"><span><input type="date" id="ovd"> <input type="number" id="ovh" min="0" max="16" step="0.5" value="0"></span><button class="b" data-addov>Add</button></div>
+    </section>
+    <section class="panel pad">
+      <h3>Baseline (hard deadlines)</h3>
+      <p class="muted" style="margin:0 0 8px;font-size:12.5px">Deadlines are frozen from the plan created on ${fmt(state.baseline.createdOn)}: final deadline <b>${fmt(state.baseline.final)}</b>. Changing settings re-plans the projection, not the deadlines. Re-baseline only for a deliberate scope or schedule change.</p>
+      <button class="b danger" data-rebase>Re-baseline deadlines from the current settings</button>
+    </section>
+    <section class="panel pad">
+      <h3>Data</h3>
+      <p class="muted" style="margin:0 0 8px;font-size:12.5px">Progress is saved in this browser only. Export a backup now and then, especially before clearing browser data or switching machines.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="b" data-export>Export JSON</button><label class="b" style="display:inline-flex;align-items:center">Import JSON<input type="file" accept="application/json" data-import hidden></label><button class="b danger" data-reset>Reset everything</button></div>
+    </section>
+  </div>`;
+}
+
+/* ======================================================================
+   EVENTS
+   ====================================================================== */
+document.addEventListener("click", e => {
+  const el = e.target.closest("[data-tab],[data-cut],[data-rmhol],[data-rmov],[data-addov],[data-rebase],[data-export],[data-reset],[data-clear-asof]");
+  if (!el) return;
+  const d = el.dataset;
+  if (d.tab) { state.ui.tab = d.tab; render.scrolled = false; save(); render(); }
+  else if (d.cut) toggleCut(d.cut);
+  else if (d.rmhol) { state.settings.holidays = state.settings.holidays.filter(h => h !== d.rmhol); commit("Holiday removed"); }
+  else if (d.rmov) { delete state.settings.overrides[d.rmov]; commit("Override removed"); }
+  else if ("addov" in d) {
+    const date = document.getElementById("ovd").value, h = parseFloat(document.getElementById("ovh").value);
+    if (!date || !(h >= 0)) return toast("Pick a date and hours");
+    state.settings.overrides[date] = h; commit(`Override set for ${fmt(date)}`);
+  }
+  else if ("rebase" in d) { if (confirm("Replace the frozen deadlines with a new plan from the current settings and estimates?")) { state.baseline = computeBaseline({ ...state.settings }); rebaseFromCurrent(); commit("Deadlines re-baselined"); } }
+  else if ("export" in d) {
+    const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `inference-lab-schedule-${today()}.json`; a.click(); URL.revokeObjectURL(a.href);
+  }
+  else if ("reset" in d) { if (confirm("Delete all progress, settings and the baseline in this browser?")) { try { localStorage.removeItem(KEY); } catch (_) {} state = load(); render(); toast("Reset"); } }
+  else if ("clearAsof" in d) { state.settings.asOf = ""; commit(); }
+});
+
+document.addEventListener("change", e => {
+  const el = e.target, d = el.dataset;
+  if (d.done) setDone(d.done, el.checked);
+  else if (d.est) { const v = parseFloat(el.value); if (v >= 0) setEst(d.est, v); }
+  else if (d.log) { const v = parseFloat(el.value); if (!isNaN(v)) setLogged(d.log, v); }
+  else if (d.set) {
+    const v = d.set === "hoursPerDay" ? parseFloat(el.value) : el.value;
+    if (d.set === "hoursPerDay" && !(v >= 0)) return;
+    if (d.set === "start" && !v) return;
+    state.settings[d.set] = v; commit();
+  }
+  else if (d.wd) { state.settings.workdays[+d.wd] = el.checked; commit(); }
+  else if ("addhol" in d) { if (el.value && !state.settings.holidays.includes(el.value)) { state.settings.holidays.push(el.value); state.settings.holidays.sort(); commit(`Holiday added: ${fmt(el.value)}`); } }
+  else if ("import" in d) {
+    const f = el.files[0]; if (!f) return;
+    f.text().then(txt => {
+      const s = JSON.parse(txt);
+      if (!s || !s.settings || !s.baseline) throw new Error("not a schedule export");
+      state = migrate(s); save(); render(); toast("Imported");
+    }).catch(err => toast("Import failed: " + err.message));
+  }
+});
+
+// Re-baselining from the current state keeps estimates the user edited.
+function rebaseFromCurrent() {
+  state.baseline = computeBaseline(state.settings, state.tasks);
+}
+
+// Roll the plan over at midnight if the page stays open.
+let lastDay = today();
+setInterval(() => { if (today() !== lastDay) { lastDay = today(); render(); } }, 60000);
+
+render();
+</script>
+</body>
+</html>
